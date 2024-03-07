@@ -6,6 +6,7 @@ const verificationController = require('../controllers/verificationController')
 
 
 module.exports={
+    
     getHome:async(req,res)=>{
             try{
                 res.render('shop/home')
