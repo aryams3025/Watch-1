@@ -1,0 +1,44 @@
+<%- include('../includes/register/loginHead.ejs') %>
+
+<section class="login_box_area section-margin">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="login_form_inner pt-5">
+                    <div style="width: 100%; height: 50px;" class="mb-3">
+                        <a style="max-width: 50%;height: 50px;" href="/"><img style="height: 50px;" src="" alt=""></a>
+                    </div>
+                    <h3>Log in to enter</h3>
+                    <form class="row login_form" method="POST" action="/home" id="register_form">
+                        <% if (typeof err !== 'undefined' && err.length > 0) { %>
+                            <div class="col-md-12 form-group">
+                                <label id="errDiv" style="border: 1px solid rgb(196, 0, 0); padding: 15px 0; width: 100%; background-color: rgb(255, 172, 172); color: rgb(196, 0, 0);" for=""><%= err %></label>
+                            </div>
+                        <% } %>
+                        <div class="col-md-12 form-group">
+                            <input type="text" class="form-control" id="email" name="email" placeholder="Email" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email'">
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Password'">
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <div class="creat_account">
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <button type="submit" value="submit" class="button button-register w-100">Login</button>
+                            <a href="/forgot-password">Forgot Password?</a>
+                            <a href="/adminsign">Login as Admin</a>
+                        </div>
+                    </form>
+                    <p>Don't have an account? <a href="/usersignup">Signup</a></p>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Other included EJS files -->
+<%- include('../includes/validations/userLoginV.ejs') %>
+<%- include('../includes/register/loginEnd.ejs') %>

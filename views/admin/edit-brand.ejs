@@ -1,0 +1,38 @@
+
+<%- include('../includes/admin/adminHead.ejs') %>
+<%- include('../includes/admin/adminNavbar.ejs') %>
+
+
+<div class="main-panel">
+    <div class="content-wrapper">
+
+        <!-- ======= Form ======== -->
+
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Edit Brand</h4>
+                <form class="forms-sample" action="/admin/edit-brand" method="POST" id="brand">
+                  <div id="errorContainer" class="alert alert-danger" style="display: none;"></div> <!-- Error container -->
+                  <div class="form-group">
+                    <input type="text" name="brand" class="form-control" value="<%= brand.brand %>" id="category-field" placeholder="Edit Brand">
+                    <input type="hidden" value="<%= brand._id %>" name="brandId">
+                    
+                  </div>
+                  <button type="submit" class="btn btn-primary mr-2">Update</button>    
+                  <button type="submit" class="btn  mr-2"><a class="btn btn-outline-danger" href="/admin/brand">Cancel</a></button>
+
+                </form>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
+
+</div>
+</div>
+
+<%- include('../includes/validations/addCategoryV.ejs') %>
+
+
+<%- include('../includes/admin/adminFooter.ejs') %>

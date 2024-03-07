@@ -1,0 +1,77 @@
+<script>
+    const errorContainer = document.getElementById('errorContainer');
+    const productForm = document.getElementById('productForm');
+    const err = document.getElementById('err')
+
+    productForm.addEventListener('submit', (event) => {
+        if(err){
+            err.style.display = 'none'
+            err.innerHTML = ""
+        }
+
+        errorContainer.style.display = 'none';
+        errorContainer.innerHTML = '';
+
+        const name = document.getElementById('exampleInputName1').value.trim();
+        const description = document.getElementById('exampleInputEmail3').value.trim();
+        const brand = document.getElementById('exampleInputEmail3').value.trim();
+        const quantity = document.getElementById('exampleInputPassword4').value.trim();
+        const price = document.getElementById('exampleInputPassword5').value.trim();
+        // const discount = document.getElementById('exampleInputPassword42').value.trim()
+        const fileInput = document.getElementById('images')
+        const filePath = fileInput.value
+        const image = document.querySelector('input[type="file"]').files;
+
+        const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+
+
+        if (!name || !description || !brand || !quantity || !price || !discount || image.length === 0) {
+            event.preventDefault();
+            errorContainer.innerHTML = 'All fields are required.';
+            errorContainer.style.display = 'block';
+        } else if (isNaN(quantity) || isNaN(price)) {
+            event.preventDefault();
+            errorContainer.innerHTML = 'Quantity and price should be numbers.';
+            errorContainer.style.display = 'block';
+        } else if ( quantity < 0 ) {
+            event.preventDefault();
+            errorContainer.innerHTML = 'Quantity should not be negative';
+            errorContainer.style.display = 'block';
+        } else if ( price < 0 ) {
+            event.preventDefault();
+            errorContainer.innerHTML = 'Price should not be negative';
+            errorContainer.style.display = 'block';
+        // }else if ( discount < 0 ) {
+        //     event.preventDefault();
+        //     errorContainer.innerHTML = 'Discount should not be negative';
+        //     errorContainer.style.display = 'block';
+        // } 
+        }else if (image.length < 1 || image.length > 4) {
+            event.preventDefault();
+            errorContainer.innerHTML = 'Please select between 1 and 4 images.';
+            errorContainer.style.display = 'block';
+        }
+        else {
+            // Image validation
+            let validImages = true;
+            for (let i = 0; i < image.length; i++) {
+                if (!allowedExtensions.test(image[i].name)) {
+                    validImages = false;
+                    break;
+                }
+            }
+            if (!validImages) {
+                event.preventDefault();
+                errorContainer.innerHTML = 'Please select images with .jpg, .jpeg, .png, or .gif extensions.';
+                errorContainer.style.display = 'block';
+            }
+        }
+    });
+
+    removeImageButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const imageItem = button.parentElement;
+                imageItem.remove();
+            });
+        });
+</script>

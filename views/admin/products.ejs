@@ -1,0 +1,406 @@
+
+<%- include('../includes/admin/adminHead.ejs') %>
+<%- include('../includes/admin/adminNavbar.ejs') %>
+
+<style>
+  
+  .pagination-btn{
+    padding: 50px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .pagination-btn a{
+    text-decoration: none;
+    color: #ececec;
+  }
+  .pagination-btn a :hover{
+    color: #111;
+  }
+  .pagination-btn button:hover{
+    color: #111;
+  }
+  .pagination-btn button:active{
+    background-color: #fff;
+    color: #111!important;
+  }
+</style>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+
+        <div><a class="badge badge-outline-primary" href="/admin/add-products">Add products</a></div>
+
+
+        
+        
+        <div class=" row   mt-3">
+
+        <div class="col-12 col-sm-6">
+          <div class="row m-0">
+            <div class="col-md-6">
+              <div class="form-group row">
+                <div class="col-sm-12">
+                  <form action="/admin/products">
+                  <select class="form-control" name="sortData">
+                    <option value="name" >Name</option>
+                    <option value="brand" >Brand</option>
+                    <option value="quantity" >Quantity</option>
+                    <option value="price" >Price</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group row">
+                <div class="col-sm-12">
+                  <select class="form-control" name="sortOrder">
+                    <option>Ascending</option>
+                    <option>Descending</option>
+                    
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="sort form-group col-md-3"><button class=" btn btn-primary form-control">
+              sort
+            </button></div>
+          </form>
+
+            
+          </div>
+          
+
+        </div>
+
+        </div>
+
+        <div style="margin-top: -10px;" class="card">
+        <div class="card-body">
+
+          <div style="max-width: unset;" class=" col-3 col-sm-6 grid-margin">
+            <div class="form-group col-12 col-sm-6 mr-1">
+              <form action="/admin/products">
+              <div class="input-group">
+                <input type="text" class="form-control" value="<%= search %>" name="search" placeholder="Search here..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                  <button class="btn btn-sm btn-primary" type="submit">Search</button>
+                </div>
+              </div>
+              </form>
+            </div>
+          </div>
+
+          <h4 class="card-title">Products</h4>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>  </th>
+                  <th> Name </th>
+                  <th> Description </th>
+                  <th> Brand Name </th>
+                  <th> Quantity </th>
+                  <th> Category </th>
+                 
+                  <th> Price </th>
+                 
+                </tr>
+              </thead>
+              <tbody>
+
+                <% for ( let product of products ) { %>
+                    <tr>
+                        <td style="width: 150px;height: auto; border-radius: 0;">
+                            <img style="width:'150px'; height: auto;border-radius: 0;"  src="/images/product-images/<%= product.image[0] %>" alt="">
+                        </td>
+                        <td>
+                          <span class="pl-2"> <%= product.name %> </span>
+                        </td>
+
+                        <td class="description-cell">
+                            <div class="description-content">
+                              <%= product.description %>
+                            </div>
+                            <button class="toggle-description">Show More</button>
+                        </td>
+                          
+                        <td> <%= product.brand.brand %> </td>
+                        <td> <%= product.quantity %> </td>
+                        <td> <%= product.category.category %> </td>
+                      
+                        <td> <%= product.price %> </td>
+                        
+                        <td>
+                              <div class="row">
+                                  <div><a class="badge badge-outline-primary mr-2" href="/admin/edit-product/<%= product._id %>"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                  </svg></a></div>
+
+                                  <% if (product.status) { %>
+                                    <div>
+                                        <a class="badge badge-outline-success" href="javascript:void(0);" onclick="confirmUnlist('<%= product._id %>')">Listed
+                                            <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"> -->
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                <% } else { %>
+                                    <div>
+                                        <a class="badge badge-outline-danger" href="javascript:void(0);" onclick="confirmList('<%= product._id %>')">Unlisted
+                                            <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16"> -->
+                                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                <% } %>
+
+
+                              </div>
+                        </td>
+                      </tr>
+                <% } %>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <!-- <div class="modal fade" id="discountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          
+          <if( availableOffers && availableOffers.length > 0) { %>
+            <for( offer of availableOffers ) { %>
+    
+                <div class="modal-content rounded-0">
+                  <div data-offerid="<offer._id %>" style="cursor: pointer;" class="modal-body text-center">
+                        <div class="icon text-danger">
+                            <i style="font-size: 20px;" class="fas fa-gift"></i>
+                        </div>
+                        <div class="notice">  
+                                <h2>< offer.name %></h2>                          
+                                <h4>< offer.percentage %>% Discount</h4>
+                            <p>Valid from < moment(offer.startingDate).format(shortDateFormat) %> to < moment(offer.expiryDate).format(shortDateFormat) %> </p>
+                        </div>
+                        <div class="code"></div>
+                    </div>
+                </div>
+            <} %>
+            <} %>
+        </div>
+      </div> -->
+    
+
+       <!-- Pagination buttons -->
+       <div class="pagination-btn">
+        <% if( currentPage !== 1 ) { %> 
+          <a 
+          href="/admin/products?page=1<% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+            ><button type="button" class="btn btn-outline-secondary 1">1</button></a>
+        <% } %>
+        <% if( currentPage > 2 ) { %>
+            <a 
+            href="/admin/products?page=<%= prevPage %><% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+              ><button type="button" class="btn btn-outline-secondary 2"><%= prevPage %></button></a> 
+        <% } %>
+        <a href="/admin/products?page=<%= currentPage %><% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+          ><button type="button" class="btn btn-outline-secondary 3 active"><%= currentPage %></button></a>
+        <% if( hasNextPage ) { %>
+            <a 
+            href="/admin/products?page=<%= nextPage %><% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+              ><button type="button" class="btn btn-outline-secondary 4"><%= nextPage %></button></a> 
+        <% } %>    
+        <% if( nextPage !== lastPage && currentPage !== lastPage ) { %>
+            <a 
+            href="/admin/products?page=<%= lastPage %><% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+              ><button type="button" class="btn btn-outline-secondary 5"><%= lastPage %></button></a>
+        <% } %>
+      </div>
+
+
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+</div>
+
+<style>
+    .badge{
+        margin-top: 10px;
+    }
+    .description-cell .description-content {
+  max-width: 200px; /* Adjust the value as per your preference */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.description-cell.collapsed .description-content {
+  max-width: none;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.description-cell .toggle-description {
+  background: none;
+  border: none;
+  margin-top: 8px;
+  color: rgb(97, 255, 108);
+  cursor: pointer;
+  padding: 0;
+}
+.table th img, .jsgrid .jsgrid-table th img, .table td img, .jsgrid .jsgrid-table td img {
+    width: 100px;
+}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+
+  function showModal(productId) {
+        $('#discountModal').modal('show');
+        const offerElements = document.querySelectorAll('.modal-body.text-center');
+        offerElements.forEach((element) => {
+            element.onclick = function() {
+                const offerId = this.getAttribute('data-offerid');
+                enterOffer(offerId, productId); 
+            };
+        });
+    }
+    async function enterOffer(offerId, productId) {
+  $('#discountModal').modal('hide');
+
+  try {
+    const response = await axios.patch('/admin/apply-product-offer', { offerId, productId });
+
+    if (response.data.success) {
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Offer applied',
+        text:'Offer Applied',
+        showConfirmButton: false,
+        timer: 1500, 
+      });
+
+      setTimeout(() => {
+        window.location = '/admin/products';
+      }, 1500); 
+    }
+  } catch (error) {
+    
+    console.error('Error applying offer:', error);
+  }
+}
+
+
+async function removeOffer(productId) {
+  // Display a SweetAlert confirmation dialog
+  const isConfirmed = await Swal.fire({
+    title: 'Are you sure?',
+    text: 'Are you sure to remove the offer',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, remove it!',
+  });
+
+  
+  if (isConfirmed.value) {
+    try {
+      const response = await axios.patch('/admin/remove-product-offer', { productId });
+
+      if (response.data.success) {
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Offer removed successfully',
+          text:'Offer removed successfully',
+          showConfirmButton: false,
+          timer: 1500, 
+        });
+        setTimeout(() => {
+          window.location = '/admin/products';
+        }, 1500); 
+      }
+    } catch (error) {
+      console.error('Error removing offer:', error);
+    }
+  }
+}
+
+
+</script>
+<script>
+  function confirmUnlist(productId) {
+      Swal.fire({
+          title: 'Are you sure?',
+          text: 'Are you sure to unlist the product',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, unlist it!'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              window.location.href = '/admin/unlist-product/' + productId;
+          }
+      });
+  }
+
+  function confirmList(productId) {
+      Swal.fire({
+          title: 'Restore Product',
+          text: 'Are you sure you want to restore this product?',
+          icon: 'info',
+          showCancelButton: true,
+          confirmButtonColor: '#28a745',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, list it!'
+      }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = '/admin/list-product/' + productId;
+          }
+      });
+  }
+</script>
+
+<script>
+    // Get all toggle buttons
+const toggleButtons = document.querySelectorAll('.toggle-description');
+const toggleDelete = document.getElementById('delete')
+
+// Add event listener to each toggle button
+toggleButtons.forEach((button) => {
+  button.addEventListener('click', function () {
+    // Find the parent description cell
+    const descriptionCell = this.closest('.description-cell');
+
+    // Toggle the 'collapsed' class on the description cell
+    descriptionCell.classList.toggle('collapsed');
+
+    // Update the button text
+    if (descriptionCell.classList.contains('collapsed')) {
+      this.textContent = 'Show less';
+    } else {
+      this.textContent = 'Show more';
+    }
+  });
+});
+
+</script>
+
+
+  <%- include('../includes/admin/adminFooter.ejs') %>

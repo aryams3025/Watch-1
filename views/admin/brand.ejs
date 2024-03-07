@@ -1,0 +1,307 @@
+
+<%- include('../includes/admin/adminHead.ejs') %>
+<%- include('../includes/admin/adminNavbar.ejs') %>
+
+<style>
+  .pagination-btn{
+  padding: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  }
+  .pagination-btn a{
+      text-decoration: none;
+      color: #ececec;
+  }
+  .pagination-btn a :hover{
+      color: #111;
+  }
+  .pagination-btn button:hover{
+      color: #111;
+  }
+  .pagination-btn button:active{
+      background-color: #fff;
+      color: #111!important;
+  }
+  .category-name span p{
+      width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+  } 
+  .modal-content p{
+      width: 400px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+  }
+
+  @media( max-width : 499px){
+      .modal-content p{
+      width: calc(100% - 44px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+  }
+  }
+</style>
+
+
+<div class="main-panel">
+  <div class="content-wrapper">
+
+      <!-- ======= Form ======== -->
+      
+      <div class="col-12 grid-margin stretch-card">
+          <div class="card">
+              <div class="card-body">
+                  <h4 class="card-title">Add Brand</h4>
+                  <div id="errorContainer" class="alert alert-danger" style="display: none;"></div> <!-- Error container -->
+          
+                      <div id="brandExist" class="alert alert-danger"></div> <!-- Error container exist category -->
+                
+                      <form class="forms-sample" action="/admin/add-brand" method="POST" id="brand">
+                          <div class="form-group">
+                              <input type="text" name="brand" class="form-control" id="category-field" placeholder="Add Brand" required>
+                          </div>
+                          <button type="submit" class="btn btn-primary mr-2">Add</button>    
+                      </form>
+                  </div>
+              </div>
+          </div>
+          
+          <!-- ======================== success model ========================= -->
+          
+        
+              <!-- The popup message modal -->
+              <!-- <div id="popupModal" class="modal fade" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content bg-dark text-white">
+                  <div class="modal-body">
+                  <h5 class="modal-title">Success</h5><br>
+                  <p></p>
+                  </div>
+              </div>
+              </div>
+          </div> -->
+      
+
+
+      
+      
+      <!-- ======================== Table ========================= -->
+      <div class=" row   mt-3">
+          <div class="col-12 col-sm-6">
+            <div class="row m-0">
+              <div class="col-md-6">
+                <div class="form-group row">
+                  <div class="col-sm-12">
+                    <form action="/admin/brand">
+                    <select class="form-control" name="sortData">
+                      <option value="category" >Category</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="col-md-4">
+                <div class="form-group row">
+                  <div class="col-sm-12">
+                    <select class="form-control" name="sortOrder">
+                      <option>Ascending</option>
+                      <option>Descending</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="sort form-group col-md-4 "><button class=" btn btn-primary form-control">
+                sort
+              </button></div>
+            </form>  
+            </div>
+          </div>
+      
+          </div>
+      
+          <div style="margin-top: -10px;" class="card">
+          <div class="card-body">
+      
+            <div style="max-width: unset;" class=" col-3 col-sm-6 grid-margin">
+              <div class="form-group col-sm-6 col-12 mr-1">
+                <form action="/admin/brand">
+                <div class="input-group">
+                  <input type="text" class="form-control" value="<%= search %>" name="search" placeholder="Search here..." aria-label="Recipient's username" aria-describedby="basic-addon2">
+                  <div class="input-group-append">
+                    <button class="btn btn-sm btn-primary" type="submit">Search</button>
+                  </div>
+                </div>
+                </form>
+              </div>
+            </div>
+
+              <h4 class="card-title">Brands</h4>
+              <div class="table-responsive">
+                  <table class="table">
+                  <thead>
+                      <tr>
+                          <th> Brand </th>
+                          <th> Status </th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <% for( let items of brand ) { %>
+                          <tr>
+                     
+                              <td class="category-name">
+                                  <span class="pl-2"><p><%= items.brand %></p></span>
+                              </td>
+                              <td>
+                                  <a href="/admin/edit-brand/<%= items._id %>"><button type="button" class="btn btn-dark btn-icon-text"> Edit <i class="mdi mdi-file-check btn-icon-append"></i>
+                                  </button></a>
+                                  <% if (items.status) { %>
+                                    <div class="badge">
+                                      <a class="badge badge-outline-success" href="#" onclick="confirmUnlist('<%= items._id %>')">Listed</a>
+                                    </div>
+                                  <% } else { %>
+                                    <div class="badge">
+                                      <a class="badge badge-outline-danger" href="#" onclick="confirmList('<%= items._id %>')">Unlisted</a>
+                                    </div>
+                                  <% } %>
+                              </td>
+                              
+                              </tr>
+                      <% } %>
+                      
+                  </tbody>
+                  </table>
+              </div>
+              </div>
+          </div>
+
+          <!-- Pagination buttons -->
+          <div class="pagination-btn">
+              <% if( currentPage !== 1 ) { %> 
+                  <a 
+                  href="/admin/category?page=1<% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+                  ><button type="button" class="btn btn-outline-secondary 1">1</button></a>
+              <% } %>
+              <% if( currentPage > 2 ) { %>
+                  <a 
+                  href="/admin/category?page=<%= prevPage %><% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+                      ><button type="button" class="btn btn-outline-secondary 2"><%= prevPage %></button></a> 
+              <% } %>
+                  <a 
+                  href="/admin/category?page=<%= currentPage %><% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+                  ><button type="button" class="btn btn-outline-secondary 3 active"><%= currentPage %></button></a>
+              <% if( hasNextPage ) { %>
+                  <a 
+                  href="/admin/category?page=<%= nextPage %><% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+                      ><button type="button" class="btn btn-outline-secondary 4"><%= nextPage %></button></a> 
+              <% } %>    
+              <% if( nextPage !== lastPage && currentPage !== lastPage ) { %>
+                  <a 
+                  href="/admin/category?page=<%= lastPage %><% if( search ) { %>&search=<%= search %><% } %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"
+                      ><button type="button" class="btn btn-outline-secondary 5"><%= lastPage %></button></a>
+              <% } %>
+          </div>
+
+          </div>
+      </div>
+
+  </div>
+</div>
+
+</div>
+</div>
+
+
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+
+
+
+
+async function removeOffer(categoryId) {
+  const isConfirmed = await Swal.fire({
+    title: 'Are you sure?',
+    text: "Are you sure to remove the offer?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, remove it!',
+  });
+
+
+  if (isConfirmed.value) {
+    try {
+      const response = await axios.patch('/admin/remove-category-offer', { categoryId });
+
+      if (response.data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Offer removed successfully',
+          text:"Offer removed successfully",
+          showConfirmButton: false,
+          timer: 1500, 
+        });
+        setTimeout(() => {
+          window.location = '/admin/category';
+        }, 1500); 
+      }
+    } catch (error) {
+      
+      console.error('Error removing offer:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error removing offer',
+        text: 'An error occurred while removing the offer. Please try again.',
+      });
+    }
+  }
+}
+
+
+</script>
+
+
+<script>
+ 
+
+  function confirmList(categoryId) {
+      Swal.fire({
+          title: 'List Category',
+          text: 'Are you sure you want to list this category?',
+          icon: 'info',
+          showCancelButton: true,
+          confirmButtonColor: '#28a745',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, list!'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              window.location.href = `/admin/list-brand/${categoryId}`;
+          }
+      });
+  }
+
+  function confirmUnlist(categoryId) {
+      Swal.fire({
+          title: 'Unlist Category',
+          text: 'Are you sure you want to unlist this category?',
+          icon: 'info',
+          showCancelButton: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, unlist!'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              window.location.href = `/admin/unlist-brand/${categoryId}`;
+          }
+      });
+  }
+</script>
+
+<%- include('../includes/validations/addCategoryV.ejs') %>
+
+<%- include('../includes/admin/adminFooter.ejs') %>

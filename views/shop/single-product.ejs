@@ -1,0 +1,396 @@
+<%- include('../includes/userHead.ejs') %>
+<%- include('../includes/userNavbar.ejs') %>
+
+<style>
+/* Add this to your existing CSS or in a style tag within your HTML */
+.pro-details {
+    padding-top: 20px;
+}
+
+.user-reviews {
+    margin-top:50px;
+}
+
+.user-review {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.3s;
+}
+
+.user-review:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-name {
+    margin: 0;
+}
+
+.review-details {
+    padding-top: 10px;
+}
+
+.rating {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.star-rating {
+    color: #f0c14b; /* Amazon's star color */
+}
+
+.comment {
+    font-size: 14px;
+    color: #555;
+    margin: 5px 0;
+}
+
+/* Adjust the styles as needed */
+
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha384-xrRanA6e9fN6e9e+AAOBSoD5I8XypjD5/1I+9a5SPdNdFvZ8GC2BEVRz9nKuP2b4" crossorigin="anonymous">
+
+<!-- Shop Details Section Begin -->
+<section style="padding-top: 90px;" class="shop-details mt-5">
+    <div class="container">
+        <div class="row">
+            <!-- Small Images -->
+            <div class="col-lg-3 col-md-3">
+                <div class="product__details__pic  d-flex justify-content-center">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <% for (let i = 0; i < product[0].image.length; i++) { %>
+                            <li class="nav-item">
+                                <a class="nav-link <% if (i === 0) { %>active<% } %>" data-toggle="tab" href="#tabs-<%= i+1 %>" role="tab">
+                                    <div class="product__thumb__pic set-bg" data-setbg="/images/product-images/<%= product[0].image[i] %>"></div>
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                    
+                </div>
+            </div>
+
+            <!-- Main Image -->
+            <div class="col-lg-4 col-md-4">
+                <div class="product__details__pic">
+                    <div class="product__details__pic__item">
+                        <img src="/images/product-images/<%= product[0].image[0] %>" id="product-image" class="zoom-img-n" alt="Product image">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="col-lg-3 col-md-3">
+                <div class="product__details__content">
+                    <div class="product__details__text">
+                        <h4><%= product[0].name %></h4>
+                        <div class="rating">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <% if (i <= (product[0].rating / 20)) { %>
+                                    <i class="fa fa-star text-warning"></i>
+                                <% } else { %>
+                                    <i class="fa fa-star-o"></i>
+                                <% } %>
+                            <% } %>
+                        </div>
+                        <% if ( product[0].offer && !product[0].category.offer) { var discount = (product[0].price * product[0].offer.percentage / 100).toFixed(0)  } else if ( product[0].category.offer && !product[0].offer ) {var discount = ( product[0].price * product[0].category.offer.percentage / 100 ).toFixed(0) }else if ( product[0].category.offer && product[0].offer ){
+                            if(product[0].offer.percentage<product[0].category.offer.percentage){
+                             {var discount = ( product[0].price * product[0].category.offer.percentage / 100 ).toFixed(0) }}
+                            else{
+                                var discount = (product[0].price * product[0].offer.percentage / 100).toFixed(0)
+                            }} %>
+                        <% if ( product[0].offer && !product[0].category.offer) { %>
+                            <p class="mb-0"><del>₹ <%= product[0].price %></del></p>
+                            <h5 class="mb-0">₹ <%= product[0].price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                        <%} else if ( product[0].category.offer && !product.offer ) { %>
+                            <p class="mb-0"><del>₹ <%= product[0].price %></del></p>
+                            <h5 class="mb-0 fw-700">₹ <%= product[0].price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                        <%} else if ( product[0].category.offer && product[0].offer ) { %>
+                            <p class="mb-0"><del>₹ <%= product[0].price %></del></p>
+                            <h5 class="mb-0 fw-700">₹ <%= product[0].price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                        <% } else { %>
+                            <h5>₹ <%= product[0].price %> </h5>
+                        <% } %>
+                       
+                        <p><%= product[0].description %></p>
+                        <div class="product__details__cart__option">
+                            <a style="cursor: pointer;" onclick="addToCart('<%= product[0]._id %>')" class="primary-btn text-white">add to cart</a>
+                        </div>
+                        <div class="product__details__btns__option">
+                            <a style="cursor: pointer;" onclick="addtoWishlist('<%= product[0]._id %>')"><i class="fa fa-heart"></i> add to wishlist</a>
+                        </div>
+                        <div class="product__details__last__option">
+                            <h5><span>Guaranteed Safe Checkout</span></h5>
+                            <img src="/user/img/shop-details/details-payment.png" alt="">
+                            <ul>
+                                <li><span>SKU:</span> 3812912</li>
+                                <li><span>Categories:</span> <%= product[0].category.category %></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade top rounded-0" style="background-color: #000000a2;" id="successModalcart" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+  aria-hidden="true" data-backdrop="true">
+  <div class="modal-dialog modal-dialog-centered modal-full-width modal-full-width" role="document">
+    <div class="modal-content rounded-0">
+      <div class="modal-header bg-success rounded-0">
+        <h5 class="modal-title" id="successModalLabel">Success</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Added to cart</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade top rounded-0" style="background-color: #000000a2;" id="successModalwishlist" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+  aria-hidden="true" data-backdrop="true">
+  <div class="modal-dialog modal-dialog-centered modal-full-width modal-full-width" role="document">
+    <div class="modal-content rounded-0">
+      <div class="modal-header bg-success rounded-0">
+        <h5 class="modal-title" id="successModalLabel">Success</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Added to wishlist</p>
+      </div>
+    </div>
+  </div>
+</div>
+<section style="padding-top: 90px;" class="pro-details mt-5 d-flex justify-content-center align-items-center">
+    <% if (product[0].review && product[0].review.length > 0) { %>
+        <div class="user-reviews">
+            <h4>User Reviews</h4>
+            <% product[0].review.forEach(async (review) => { %>
+                <div class="user-review">
+                    <div class="user-info">
+                        <p class="user-name"><strong><%= review.userId.firstName %> <%= review.userId.lastName %></strong></p>
+                    </div>
+                    <div class="review-details">
+                        <p class="rating">Rating: <%= review.rating %> stars</p>
+                        <div class="star-rating">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <% if (i <= review.rating) { %>
+                                    <i class="fa fa-star"></i>
+                                <% } else { %>
+                                    <i class="fa fa-star-o"></i>
+                                <% } %>
+                            <% } %>
+                        </div>
+                        <p class="comment">Comment: <%= review.comment %></p>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <p>No reviews available for this product.</p>
+    <% } %>
+</section>
+
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="/js/jquery-zoom/jquery.ez-plus.js"></script>
+<script src="/js/jquery-zoom/jquery.mousewheel.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+<script>
+
+$(`.zoom-img-n`).ezPlus({
+
+container: 'ZoomContainer',
+attrImageZoomSrc: 'zoom-image', // attribute to plugin use for zoom
+borderColour: '#888',
+borderSize: 0,
+constrainSize: true,  //in pixels the dimensions you want to constrain on
+constrainType: false,  //width or height
+containLensZoom: true,
+cursor: 'inherit', // user should set to what they want the cursor as, if they have set a click function
+debug: false,
+easing: true, // easing effects
+easingAmount: 10,
+enabled: true,
+
+// gallery options
+gallery: false,
+galleryActiveClass: 'zoomGalleryActive',
+gallerySelector: false,
+galleryItem: 'a',
+galleryEvent: 'click',
+
+// enable cross-fade effect
+imageCrossfade: false,
+
+// lens options
+lensBorderColour: '#000',
+lensBorderSize: 1,
+lensColour: 'white', //colour of the lens background
+lensFadeIn: false,
+lensFadeOut: false,
+lensOpacity: 0.4, //opacity of the lens
+lensShape: 'square', //can be 'round'
+lensSize: 100,
+lenszoom: false,
+
+// image loading spinner
+loadingIcon: false, //http://www.example.com/spinner.gif
+
+// This change will allow to decide if you want to decrease
+// zoom of one of the dimensions once the other reached it's top value,
+// or keep the aspect ratio, default behaviour still being as always,
+// allow to continue zooming out, so it keeps retrocompatibility.
+mantainZoomAspectRatio: true,
+maxZoomLevel: false,
+minZoomLevel: 2,
+
+// callbacks
+onComplete: $.noop,
+onDestroy: $.noop,
+onImageClick: $.noop,
+onImageSwap: $.noop,
+onImageSwapComplete: $.noop,
+onShow: $.noop,
+onHide: $.noop,
+onZoomedImageLoaded: $.noop,
+
+preloading: 1, //by default, load all the images, if 0, then only load images after activated (PLACEHOLDER FOR NEXT VERSION)
+respond: [],
+responsive: true,
+scrollZoom: false, //allow zoom on mousewheel, true to activate
+scrollZoomIncrement: 0.1,  //steps of the scrollzoom
+showLens: true,
+tint: false, //enable the tinting
+tintColour: '#333', //default tint color, can be anything, red, #ccc, rgb(0,0,0)
+tintOpacity: 0.4, //opacity of the tint
+touchEnabled: true,
+
+// zoom options
+zoomActivation: 'hover', // Can also be click (PLACEHOLDER FOR NEXT VERSION)
+zoomContainerAppendTo: 'body', //zoom container parent selector
+zoomId: -1, // identifier for the zoom container
+zoomLevel: 1, //default zoom level of image
+zoomTintFadeIn: false,
+zoomTintFadeOut: false,
+zoomType: 'window', //window is default,  also 'lens' available -
+zoomWindowAlwaysShow: false,
+zoomWindowBgColour: '#fff',
+zoomWindowFadeIn: false,
+zoomWindowFadeOut: false,
+zoomWindowHeight: 300,
+zoomWindowOffsetX: 0,
+zoomWindowOffsetY: 0,
+zoomWindowPosition: 1, //Possible values: 1-16, but we can also position with a selector string.
+zoomWindowWidth: 300,
+zoomEnabled: true, //false disables zoomwindow from showing
+zIndex: 999
+
+});
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+    async function addToCart( productId ){
+
+        try {
+            
+            const response = await axios.post('/add-to-cart',{productId})
+            
+            if( !response.data.login ){
+                return window.location.href = '/login'
+            } 
+            if( response.data.newItem === true ){
+                const count = document.getElementById('cartCount')
+                currentCount = parseInt(count.innerHTML)
+                updatedCount = currentCount + 1
+                count.innerHTML = updatedCount 
+                
+                Swal.fire({
+                    title: 'Product Added to Cart',
+                    text: 'The selected product has been added to your cart.',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'OK'
+                });
+
+
+                // Show the success modal
+                successModal.classList.add("show");
+                successModal.style.display = "block";
+                bdy.style.overflow = 'hidden'
+                
+                // Hide the success modal when clicked anywhere
+                successModal.addEventListener("click", () => {
+                    successModal.classList.remove("show");
+                    successModal.style.display = "none";
+                    bdy.style.overflow = 'auto'
+                    
+                });
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async function addtoWishlist(productId) {
+            try {
+                const response = await axios.post('/add-to-wishlist', { productId });
+                
+
+                if (response.data.success) {
+                    // Display a success message
+                    Swal.fire({
+                        title: 'Added to Wishlist',
+                        text: 'The product has been added to your wishlist.',
+                        icon: 'success',
+                        confirmButtonColor: '#28a745'
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+
+                // Display an error message
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred while adding the product to your wishlist. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        }
+
+</script>
+
+
+<%- include('../includes/userFooter.ejs') %>
+<%- include('../includes/end.ejs') %>
