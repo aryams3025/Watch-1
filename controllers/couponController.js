@@ -126,65 +126,6 @@ module.exports={
         }catch(error){
             res.redirect('/500')
         }
-    },
-    //Applying the coupon in userside
-    applyCoupn:async(req,res)=>{
-        try{
-            const {couponCode,total}=req.body
-            const {user}=req.session
-            const coupon= await couponSchema.find({name:couponCode,status:true})
-            //if coupon exists
-            if(coupon && coupon.length>0){
-                const now=new Date()
-                //if coupon not expired
-                if(coupon[0].expiryDate>= now && coupon[0].startingDate<=now){
-                    //convert the user Ids in the users array to strings for comparisson
-                    const userIds=coupon[0].users.map((userId)=>String((userId)))
-                    //Check if the desired UserId is present in the array 
-                    const userExist=userIds.includes(user)
-                    // If user already used coupon
-                    if(userExist){
-                        res.json({success:false,message:"Coupon already used by the user"})
-                    }else{
-                        //checking the minimum Amount
-                        if(total<coupon[0].minimumAmount){
-                            res.json({success:false,message:"Minimum amount not reached"})
-                        }else{
-                            await cartSchema.updateOne({userId:user},{
-                                $set:{
-                                    coupon:coupon[0]._id
-                                }
-                            })
-                            const cart=await cartSchema.findOne({userId:user})
-                            let discounted
-                            if(cart.coupon){
-                                discounted=await couponHelper.discountPrice(cart.coupon,total)
-
-                            }
-                            res.json({success:true,message:'Available',discounted:discounted,coupona:coupon[0].minimumAmount})
-                        }
-                    }
-                }else{
-                    res.json({success:false,message:"Invalid Coupon, out Dated"})
-                }
-            }else{
-                res.json({success:false,message:"Invalid Coupon"})
-            }
-        }catch(error){
-            res.redirect('/500')
-        }
-    },
-    //Cancel the coupon in user side
-    cancelCouponuser:async(req,res)=>{
-            try {
-                const { user } = req.session;
-        
-                await cartSchema.updateOne({ userId: user }, { $unset: { coupon: 1 } });
-        
-                res.json({ success: true, message: 'Coupon canceled successfully', });
-            } catch (error) {
-                res.status(500).json({ success: false, error: 'Internal Server Error' });
-            }
-    },
+    }
 
 }
