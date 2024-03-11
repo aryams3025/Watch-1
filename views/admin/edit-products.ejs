@@ -52,6 +52,10 @@
                             <label for="exampleInputPassword4">Price</label>
                             <input type="number" class="form-control" value="<%= product.price %>" id="exampleInputPassword5" name="price" placeholder="Price" required>
                         </div>
+                        <div class="form-group col-4">
+                            <label for="exampleInputPassword7">Discount</label>
+                            <input type="number" class="form-control" value="<%= product.discount %>" id="exampleInputPassword7" name="discount" placeholder="Discount" required>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -121,6 +125,7 @@
         const brand = document.getElementById('exampleInputEmail4').value.trim();
         const quantity = document.getElementById('exampleInputPassword4').value.trim();
         const price = document.getElementById('exampleInputPassword5').value.trim();
+        const discount = document.getElementById('exampleInputPassword7').value.trim();
         const fileInput = document.getElementById('images')
         const filePath = fileInput.value
         const image = document.querySelector('input[type="file"]').files;
@@ -128,7 +133,7 @@
         const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
 
 
-        if (!name || !description || !brand || !quantity || !price ) {
+        if (!name || !description || !brand || !quantity || !price || !discount ) {
             event.preventDefault();
             errorContainer.innerHTML = 'All fields are required.';
             errorContainer.style.display = 'block';
@@ -143,6 +148,10 @@
         } else if ( price < 0 ) {
             event.preventDefault();
             errorContainer.innerHTML = 'Price should not be negative';
+            errorContainer.style.display = 'block';
+        }else if ( discount < 0 ) {
+            event.preventDefault();
+            errorContainer.innerHTML = 'Discount should not be negative';
             errorContainer.style.display = 'block';
         } else if ( (imgPossible === 4 && image.length === 0) || image.length > imgPossible) {
             event.preventDefault();
