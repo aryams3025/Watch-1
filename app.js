@@ -9,6 +9,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const adminrouter = require('./routers/adminRouter');
 const shopRouter = require('./routers/shopRouter');
 const authrouter = require('./routers/authRouter');
+const userRouter = require('../Watch-1/routers/userRouter')
 const moment = require('moment');
 
 const app = express();
@@ -33,6 +34,7 @@ app.locals.shortDateFormat = shortDateFormat;
 
 app.use(authrouter);
 app.use('/admin', adminrouter);
+app.use('/user',userRouter)
 app.use('/', shopRouter);
 
 passport.use(new GoogleStrategy({
