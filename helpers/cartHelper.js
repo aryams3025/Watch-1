@@ -1,0 +1,1 @@
+const cartSchema = require('../model/cartModel')

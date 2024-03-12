@@ -104,6 +104,19 @@ module.exports = {
             console.log(error);
         }
         
+    },
+    editProfile : async(req,res)=>{
+        try{
+            await userSchema.updateOne({_id:req.session.user},{$set:{
+                firstName : req.body.firstName,
+                lastName : req.body.lastName,
+                mobile : req.body.mobile,
+                email : req.body.email
+            }})
+            res.status(200).json({status : true})
+        }catch(error){
+            console.log(error);
+        }
     }
 
 }
