@@ -6,7 +6,7 @@ const isAuth = require('../middleware/isAuth')
 const isBlocked = require('../middleware/isBlocked')
 
 router.get('/profile',isAuth.userAuth,userController.getUserProfile)
-
+router.put('/edit-profile',isAuth.userAuth,userController.editProfile)
 
 router.get('/address',isAuth.userAuth,userController.userAddress)
 router.get('/add-address',isAuth.userAuth,userController.getaddAddress)
