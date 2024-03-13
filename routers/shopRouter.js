@@ -8,5 +8,5 @@ router.get('/shop',shopController.getShop);
 router.get('/products/:id',shopController.getSingleProduct)
 
 router.get('/cart',isAuth.userAuth,cartController.getCart)
-
+router.post('/add-to-cart',isAuth.userAuth,cartController.addToCart)
 module.exports = router;
