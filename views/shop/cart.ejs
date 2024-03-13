@@ -125,39 +125,23 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
-                    <div class="cart__discount">
-                        <h6>Discount Coupons</h6>
-                      
-                            
-                                <form id="coupon-form">
-                                    <input id="coupon-input" type="text" placeholder="Coupon code">
-                                    <% if (discounted) { %>
-                                        <button onclick="cancelCoupon(event)" id="cancel">Cancel</button>
-                                    <% }else{ %>
-                                    <button onclick="applyCoupon(event)">Apply</button>
-                                    <% } %>
-                                </form>
-                                <div id="coupon-message" class="coupon-message"></div>
-                        </div>
-                    <div class="container">
-                        <button type="button" class="btn btn-danger rounded-0 badge-dar mb-2" data-toggle="modal" data-target="#discountModal">
-                          Show Available coupons
-                        </button>  
-                      </div>
-                    <div class="cart__total">
-                        <h6>Cart total</h6>
-                        <ul>
-                            <li>Subtotal <span id="subtotal">₹ <%= totalAmount[0].total %></span></li>
-                            <li>Coupon discount <span id="coupon-discount"><% if( discounted ) { %>- ₹ <%= discounted.discountAmount %> <% } else { %>₹ 0<% } %></span></li>
-                            <li>Total <span id="total"><% if( discounted ) { %>₹ <%= discounted.discountedTotal %><% } else { %>₹ <%= totalAmount[0].total %><% } %></span></li>
-                        </ul>
+                /<div class="col-lg-4">
+              
+                   <br>
+                   <div class="cart__total">
+                       <h6>Cart total</h6>
+                       <ul>
+    <li>Subtotal <span id="subtotal">₹ <%= totalAmount[0].total %></span></li>
+    <li>discount <span id="coupon-discount"><%= (discounted && discounted.discountAmount) ? '- ₹ ' + discounted.discountAmount : '₹ 0' %></span></li>
+    <li>Total <span id="total"><%= (discounted && discounted.discountedTotal) ? '₹ ' + discounted.discountedTotal : '₹ ' + totalAmount[0].total %></span></li>
+</ul>
+
                         
-                            <a href="/checkout" class="primary-btn">Proceed to checkout</a>
+                           <a href="/checkout" class="primary-btn">Proceed to checkout</a>
                        
                         
-                    </div>
-                </div>
+                 </div>
+                 </div>
             </div>
         <% } else { %>
             <div class="col-12 mt-5">
@@ -197,40 +181,7 @@
 
 <!-- Coupon modal -->
 
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-<div class="modal fade" id="discountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      
-      <% if( availableCoupons && availableCoupons.length > 0) { %>
-        <% for( coupon of availableCoupons ) { %>
-
-            <div class="modal-content rounded-0">
-                <div class="modal-body text-center">
-                    <div class="icon text-danger">
-                        <i class="fas fa-gift"></i>
-                    </div>
-                    <div class="notice">
-                        <% if( coupon.discountType === 'percentage') { %>
-                            <h4>Get <%= coupon.discount %>% Discount</h4>
-                        <% } else if( coupon.discountType === 'fixed-amount' ) { %>
-                            <h4>Get ₹ <%= coupon.discount %> Discount</h4>
-                        <% } %>
-                        <p id="minimumAmount">This coupon only available for purchase above ₹ <%= coupon.minimumAmount %></p>
-                        <p>And valid from <%= moment(coupon.startingDate).format(shortDateFormat) %> to <%= moment(coupon.expiryDate).format(shortDateFormat) %> </p>
-                        <p>Use promo code <spans style="font-size: medium;" class="badge badge-info"><%= coupon.name %></span></p>
-                    </div>
-                    <div class="code"></div>
-                </div>
-            </div>
-        <% } %>
-        <% } %>
-      
-    </div>
-  </div>
-  
   
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
