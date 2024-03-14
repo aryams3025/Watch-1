@@ -64,8 +64,10 @@ module.exports = {
 
     getProductsList: async (req, res) => {
         try {
-            const { search, sortData, sortOrder } = req.query;
-            let page = Number(req.query.page) || 1;
+            const { search, sortData, sortOrder } = req.query || {};
+            // let page = Number(req.query.page) || 1;
+            let page = Number(req.query && req.query.page) || 1;
+
 
             const sort = {};
             const condition = {};
