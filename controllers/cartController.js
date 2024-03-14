@@ -1,55 +1,8 @@
 const cartSchema = require('../model/cartModel');
 const cartHelper = require('../helpers/cartHelper');
 const productSchema = require('../model/productModel');
+const { getProductsList } = require('./productController');
 
-// const getCart = async (req,res)=>{
-//     try {
-//         // Extracting user session
-//         const { user } = req.session;
-
-//         // Variable to store the count of the products after updating quantity 
-//         let productCount;
-
-//         // Updating the quantities in the cart and documenting product count in session if necessary
-//         productCount = await cartHelper.updateQuantity(user);
-
-//         if (productCount) {
-//             req.session.productCount--;
-//         }
-
-//         // Then retrieving updated cart with populated product information
-//         const updatedCart = await cartSchema.findOne({ userId: user })
-//             .populate({
-//                 path: 'items.productId',
-//                 populate: {
-//                     path: 'category'
-//                 }
-//             });
-
-        
-//         console.log(updatedCart);
-//         console.log("hai");
-
-//         const totalPrice = await cartHelper.totalCartPrice(user)
-
-//         // checking if cart exists and has time 
-//         if (updatedCart && updatedCart.items.length > 0) {
-//             // updating prices
-//             updatedCart.items.forEach(items => {
-//                 return items;
-//             });
-//         }
-        
-//         res.render('shop/cart',{
-//             cartItems : updatedCart,
-//             totalAmount : totalPrice
-//         })
-
-//     } catch (error) {
-//         console.log(error);
-        
-//     }
-// };
 
 const getCart = async (req, res) => {
     try {
@@ -203,7 +156,60 @@ const addToCart = async (req, res) => {
     }
 }
 
+const decart = async (req, res) => {
+    try {
+        const { user } = req.session;
+        const { productId } = req.body;
+
+        const updatedCart = await cartSchema.findOneAndUpdate({
+            userId: user,
+            'items': {
+                $elemMatch: {
+                    productId: productId,
+                    quantity: { $gte: 2 }
+                }
+            }
+        },
+        { $inc: { 'items.$.quantity': -1 } },
+        { new: true });
+
+        if (updatedCart) {
+            // changing the cart price 
+            const cart = await cartSchema.findOne({ userId: user });
+            let totalPrice = 0;
+            let discountedPrice = 0;
+
+            // Calculate total price and discounted price
+            for (const item of cart.items) {
+                // Assuming getProductsList fetches product details based on productId
+                const product = await getProductsList(item.productId);
+                totalPrice += product.price * item.quantity;
+                discountedPrice += (product.price * (1 - (product.discount / 100))) * item.quantity;
+            }
+
+            res.status(200).json({ success: true, message: 'Cart item decreased', totalPrice: totalPrice, discountedPrice: discountedPrice });
+        } else {
+            res.json({ success: false, message: `Can't decrease the quantity` });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+const removeCartItem = async(req,res) =>{
+    try{
+        //destructuring the details of user and items with their item id
+        const {user} = req.session
+        const {itemId} = req.body
+        await cartSchema.updateOne({userId : user, ' items._id' : itemId},{$pull:{items : {_id:itemId}}})
+    }catch(error){
+        console.log(error);
+    }
+}
+
 module.exports = {
     getCart,
-    addToCart
+    addToCart,
+    decart
 };
