@@ -66,6 +66,7 @@ module.exports = {
         try {
             const { search, sortData, sortOrder } = req.query || {};
             // let page = Number(req.query.page) || 1;
+            // let page = Number(req.query && req.query.page) || 1;
             let page = Number(req.query && req.query.page) || 1;
 
 
@@ -94,7 +95,8 @@ module.exports = {
 
             res.render('admin/products', {
                 admin: req.session.admin,
-                products: products,
+                // products: products,
+                products: products || [],
                 categories: categories,
                 currentPage: page,
                 hasNextPage: page * paginationHelper.PRODUCT_PER_PAGE < productsCount,

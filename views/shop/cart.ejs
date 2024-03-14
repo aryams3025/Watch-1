@@ -125,16 +125,16 @@
                         </div>
                     </div>
                 </div>
-                /<div class="col-lg-4">
+                <div class="col-lg-4">
               
                    <br>
                    <div class="cart__total">
                        <h6>Cart total</h6>
                        <ul>
-    <li>Subtotal <span id="subtotal">₹ <%= totalAmount[0].total %></span></li>
-    <li>discount <span id="coupon-discount"><%= (discounted && discounted.discountAmount) ? '- ₹ ' + discounted.discountAmount : '₹ 0' %></span></li>
-    <li>Total <span id="total"><%= (discounted && discounted.discountedTotal) ? '₹ ' + discounted.discountedTotal : '₹ ' + totalAmount[0].total %></span></li>
-</ul>
+                            <li>Subtotal <span id="subtotal">₹ <%= totalAmount[0].total %></span></li>
+                            <li>discount <span id="coupon-discount"><%= (discounted && discounted.discountAmount) ? '- ₹ ' + discounted.discountAmount : '₹ 0' %></span></li>
+                            <li>Total <span id="total"><%= (discounted && discounted.discountedTotal) ? '₹ ' + discounted.discountedTotal : '₹ ' + totalAmount[0].total %></span></li>
+                        </ul>
 
                         
                            <a href="/checkout" class="primary-btn">Proceed to checkout</a>
@@ -404,6 +404,7 @@ async function cancelCoupon(event) {
                         window.location = '/cart'
                     }
                     if( response.data.success === true){
+                        console.log(response.data.success)
                         const updatedQty = currentQty-1
                         const totalPrice = totalNumber - price
                        
