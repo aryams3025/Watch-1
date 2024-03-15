@@ -10,6 +10,6 @@ router.get('/products/:id',shopController.getSingleProduct)
 router.get('/cart',isAuth.userAuth,cartController.getCart)
 router.post('/add-to-cart',isAuth.userAuth,cartController.addToCart)
 
-router.post('/decrease-cart',isAuth.userAuth,cartController.decart)
+router.post('/decrease-cart',isAuth.userAuth,cartController.deCart)
 router.patch('/removeCartItem',isAuth.userAuth,cartController.removeCartItem)
 module.exports = router;
