@@ -62,7 +62,7 @@ module.exports = {
         }
     },
 
-    getProductsList: async (req, res) => {
+    getProductDetails: async (req, res) => {
         try {
             const { search, sortData, sortOrder } = req.query || {};
             // let page = Number(req.query.page) || 1;
@@ -93,7 +93,7 @@ module.exports = {
                 .skip((page - 1) * paginationHelper.PRODUCT_PER_PAGE)
                 .limit(paginationHelper.PRODUCT_PER_PAGE);
 
-            res.render('admin/products', {
+                res.render('admin/products', {
                 admin: req.session.admin,
                 // products: products,
                 products: products || [],
