@@ -314,7 +314,7 @@ async function cancelCoupon(event) {
             const price = Number(priceTag[1])
             const totalNumber = Number(currentTotal [1])
             const cancel=document.getElementById('cancel')
-            if(cancel){
+            if(cancel !==null && cancel !== undefined){
                 Swal.fire({
             icon: 'Warning',
             title: 'Warning',
@@ -388,7 +388,7 @@ async function cancelCoupon(event) {
                     const totalNumber = Number(currentTotal [1])
                     const currentQty = parseInt(qty.val())
                     const cancel=document.getElementById('cancel')
-                    if(cancel){
+                    if( cancel !== null && cancel !== undefined ){
                         Swal.fire({
                     icon: 'Warning',
                     title: 'Warning',

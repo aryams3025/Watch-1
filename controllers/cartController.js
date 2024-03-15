@@ -1,7 +1,7 @@
 const cartSchema = require('../model/cartModel');
 const cartHelper = require('../helpers/cartHelper');
 const productSchema = require('../model/productModel');
-const { getProductsList } = require('./productController');
+const { getProductsList, getProductDetails } = require('./productController');
 
 
 const getCart = async (req, res) => {
@@ -209,7 +209,14 @@ const addToCart = async (req, res) => {
                                 }
 
                                 // Calculate total discounted amount
-                                const totalDiscountedAmount = discounted.discountAmount;
+                                // const totalDiscountedAmount = discounted.discountAmount;
+                                //const totalDiscountedAmount = res.data.discounted ? res.data.discounted.discountAmount : 0;
+
+                                let totalDiscountedAmount = 0;
+                                if (response.data.discounted) {
+                                     totalDiscountedAmount = res.data.discounted.discountAmount;
+                                }
+
 
                                 // Respond with success message and updated cart details
                                 res.status(200).json({
@@ -303,7 +310,7 @@ const decart = async (req, res) => {
             // Calculate total price and discounted price
             for (const item of cart.items) {
                 // Assuming getProductsList fetches product details based on productId
-                const product = await getProductsList(item.productId);
+                const product = await getProductDetails(item.productId);
                 totalPrice += product.price * item.quantity;
                 discountedPrice += (product.price * (1 - (product.discount / 100))) * item.quantity;
             }

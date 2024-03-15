@@ -155,21 +155,41 @@ module.exports={
     },
 
     //resending otp
-    resendOtp : async(req,res)=>{
+    // resendOtp : async(req,res)=>{
        
-        try{
-            let email = req.session.unVerifiedMail
-            const otp = verificationController.sendMail(email)
-            await userSchema.updateOne({email:email},{$set:{
-                token : {
-                    otp : otp ,
-                    generatedTime : new Date()
+    //     try{
+    //         let email = req.session.unVerifiedMail
+    //         const otp = verificationController.sendMail(email)
+    //         await userSchema.updateOne({email:email},{$set:{
+    //             token : {
+    //                 otp : otp ,
+    //                 generatedTime : new Date()
+    //             }
+    //         }})
+    //     }catch(error){
+    //         console.log(error);
+    //     }
+    // },
+
+    resendOtp: async (req, res) => {
+        try {
+            const email = req.session.unVerifiedMail;
+            const otp = verificationController.sendMail(email);
+            await userSchema.updateOne({ email: email }, {
+                $set: {
+                    token: {
+                        otp: otp,
+                        generatedTime: new Date()
+                    }
                 }
-            }})
-        }catch(error){
+            });
+            res.redirect('/otp-verification'); // Redirect to the OTP verification page after sending OTP
+        } catch (error) {
             console.log(error);
+            res.redirect('/500'); // Redirect to an error page if there's an error
         }
     },
+    
     forgotresendOtp : async(req,res)=>{
         try{
             let email = req.session.unVerifiedMail

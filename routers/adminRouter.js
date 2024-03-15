@@ -18,7 +18,7 @@ router.patch('/unblock-user/:id',isAuth.adminAuth,adminController.unblockUser)
 
 
 
-router.get('/products',isAuth.adminAuth,productController.getProductsList)
+router.get('/products',isAuth.adminAuth,productController.getProductDetails)
 router.get('/add-products',isAuth.adminAuth,productController.getAddProducts)
 router.post('/add-products',isAuth.adminAuth,upload_image.array('image',4),productController.addProducts)
 router.get('/edit-product/:id',isAuth.adminAuth,productController.editProduct),
