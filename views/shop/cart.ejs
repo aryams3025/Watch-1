@@ -132,8 +132,7 @@
                         <h6>Cart total</h6>
                         <ul>
                             <li>Subtotal <span id="subtotal">₹ <%= totalAmount[0].total %></span></li>
-                            <li>Coupon discount <span id="coupon-discount"><% if( discounted ) { %>- ₹ <%= discounted.discountAmount %> <% } else { %>₹ 0<% } %></span></li>
-                            <li>Total <span id="total"><% if( discounted ) { %>₹ <%= discounted.discountedTotal %><% } else { %>₹ <%= totalAmount[0].total %><% } %></span></li>
+                            
                         </ul>
                         
                             <a href="/checkout" class="primary-btn">Proceed to checkout</a>
@@ -275,14 +274,14 @@
                 });
             }
             if( response.data.success === true){
-                
+                window.location.reload();
                 const currentQty = parseInt(qty.val())
                 const updatedQty = currentQty + 1;
                 const totalPrice = updatedQty * price;
                 updatedQty > 2 ? dec.show() : null ;
                 totalCartPrice.innerHTML = `₹ ${response.data.totalPrice[0].total}`
                 subtotalCartPrice.innerHTML = `₹ ${response.data.totalPrice[0].total}`
-                
+               
                 qty.val(updatedQty);
                 if( response.data.discounted ) {
                     totalCartPrice.innerHTML = `₹ ${response.data.discounted.discountedTotal}`
@@ -332,6 +331,7 @@
                         window.location = '/cart'
                     }
                     if( response.data.success === true){
+                        window.location.reload();
                         const updatedQty = currentQty-1
                         const totalPrice = totalNumber - price
                        
