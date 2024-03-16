@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const shopController = require('../controllers/shopController');
 const isAuth = require('../middleware/isAuth');
+const isBlocked = require('../middleware/isBlocked')
 const cartController = require('../controllers/cartController')
 // router.get('/', shopController.getHome);
 router.get('/shop',shopController.getShop);
@@ -12,4 +13,13 @@ router.post('/add-to-cart',isAuth.userAuth,cartController.addToCart)
 
 router.post('/decrease-cart',isAuth.userAuth,cartController.deCart)
 router.patch('/removeCartItem',isAuth.userAuth,cartController.removeCartItem)
+
+
+
+router.get('/checkout',isAuth.userAuth,isBlocked.isBlocked,shopController.getCheckOut)
+router.get('/add-checkout-address',isAuth.userAuth,isBlocked.isBlocked,shopController.getCheckoutAddAddress)
+router.post('/add-checkout-address',isAuth.userAuth,isBlocked.isBlocked,shopController.checkoutAddAddress)
+
+
+
 module.exports = router;
