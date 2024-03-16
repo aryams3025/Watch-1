@@ -239,10 +239,10 @@ module.exports={
             console.log(error);
         }
     },
-    forgotpassword : async(req,res)=>{
+    getforgotpassword : async(req,res)=>{
         res.render('auth/forgot-password')
     },
-    postforgotpassword : async(req,res)=>{
+    forgotpassword : async(req,res)=>{
 
         try{
             const emailExist = await userSchema.findOne({email:req.body.email})
@@ -258,7 +258,7 @@ module.exports={
                     }
                 )
                 req.session.unVerifiedMail = req.body.email
-                res.render('/auth/forgot-password-otp')
+                res.render('auth/forgot-password-otp')
             }else{
                 res.redirect('/forgot-password')
             }
@@ -266,5 +266,81 @@ module.exports={
             console.log(error);
         }
         
+    },
+    forgotPasswordOtpVerification:async(req,res)=>{
+        try{
+             const enterTime = new Date()
+            let { val1, val2, val3, val4, val5, val6 } = req.body
+            userOtp = val1 + val2 + val3 + val4 + val5 + val6
+    
+            // Checking otp in database
+            const otpCheck = await userSchema.findOne({email: req.session.unVerfiedMail, 'token.otp' : userOtp })
+    
+            // If Otp matched
+            if( otpCheck ) { 
+    
+                //Calculating the expire of the OTP
+                const timeDiff =  (new Date(enterTime) - otpCheck.token.generatedTime) / 1000 / 60
+                if( timeDiff <= 60 ) {
+                    console.log('otp matched');
+                    // If expiry time is valid setting isVerified as true
+                    res.render('auth/passwordReEnter',{
+                        err : req.flash('err')
+                    })
+                   // If TimedOut
+                } else {
+                    console.log('timout');
+                    res.redirect( '/otp-verification' )
+                }
+    
+                // If not OTP in database
+            } else {
+                console.log('otp not matched');
+                res.redirect('/otp-verification')
+            }
+            
+        }catch(error){
+            res.redirect('/500')
+        }
+    },
+    getuserChangePassword : async(req,res) =>{
+        res.render('auth/changepassword',{err:req.flash('existErr')})
+    },
+    changeUserPassword : async(req,res) =>{
+        try{
+            const user = req.session.user;
+            const { oldpassword, password , confirmpassword} = req.body
+            const userExist = await userSchema.findOne({_id : user})
+           
+            if (userExist) {
+                const isPasswordMatch = await bcrypt.compare(oldpassword, userExist.password)
+
+                if(isPasswordMatch){
+                    const hashedNewPassword = await bcrypt.hash(password , 12);
+                    await userSchema.updateOne({ _id: user }, { $set: { password: hashedNewPassword } });
+                    return res.status(200).json({ success: true });
+                }else {
+                    return res.status(401).json({ oldpasswordwrong: true});                    
+                }
+            }else {
+                return res.status(401).json({oldpassword : true});
+            }
+
+        }catch(error){
+            console.log(error);
+        }
+    },
+    newPassword:async(req,res)=>{
+        try{
+            const password=await bcrypt.hash(req.body.password,12)
+            await userSchema.findOneAndUpdate({email:req.session.unVerfiedMail,isBlocked:false},{
+                $set:{
+                    password:password
+                }
+            })
+            res.redirect('/login')
+        }catch(error){
+            res.redirect('/500')
+        }
     }
 }
