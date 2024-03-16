@@ -1,0 +1,230 @@
+
+
+<%- include('../includes/userHead.ejs') %>
+<%- include('../includes/userNavbar.ejs') %>
+
+
+<section class="checkout spad mt-5">
+    <div class="container">
+        <div class="checkout__form">
+            <form id="checkout-form">
+                <div class="row" style="display: flex; justify-content: space-between;">
+                    <div class="col-6">
+                        <% if( address && address.length > 0) { %>
+                            <% for (let [index, items] of address.entries()) { %>
+                                <div style="background-color: #bcbcbc62; padding: 20px;" class="row pl-lg-5 address mb-4">
+                                    <label for="address-<%= items._id %>">
+                                        <input type="radio" id="address-<%= items._id %>" name="addressId" value="<%= items._id %>"
+                                            <% if (index === 0) { %>checked<% } %>
+                                        >
+                                        <%= `${items.fullName}, ${items.mobile}, ${items.street}, ${items.village}, ${items.city}, Near ${items.landmark}, PIN Code: ${items.pincode}, ${items.state}` %>
+                                    </label>
+                                </div>
+                            <% } %>
+                        <% } %>
+                        <div class="row mt-3 pl-lg-5 address p-2">
+                            <a class="btn text-primary fw-bold" href="/add-checkout-address">Add Address</a>
+                        </div>
+                    </div>
+                    <!-- modal -->
+                <% if( cartAmount && cartAmount.length > 0 && cartAmount[0].items ) { %>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="checkout__order">
+                            <h4 class="order__title">Your order</h4>
+                            <div class="checkout__order__products">Product <span>Total</span></div>
+                            <ul class="checkout__total__products">
+                                <% for (let item of cartAmount[0].items) { %>
+                                    <li><%= item.productName %><span>₹ <%= item.totalPrice %></span></li>
+                                <% } %>
+                            </ul>
+                            <ul class="checkout__total__all">
+                                <li>Subtotal <span>₹ <%= cartAmount[0].total %></span></li>
+                                <li>Discount <span><% if( discounted ) { %>- ₹ <%= discounted.discountAmount %> <% } else { %>₹ 0<% } %></span></li>
+                                <li>Total <span><% if( discounted ) { %>₹ <%= discounted.discountedTotal %><% } else { %>₹ <%= cartAmount[0].total %><% } %></span></li>
+                            </ul>
+                            <% if( user.wallet && user.wallet > 0 ) { %>
+                                <ul class="checkout__total__all">
+                                    <li> 
+                                        <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                                            <div>
+                                                <input type="checkbox" id="wallet" name="wallet" value="<%= user.wallet %>">
+                                                <label style="font-weight: 700;" for="wallet">Use wallet balance</label>
+                                            </div>
+                                            <div><span> ₹ <%= user.wallet %> </span></div>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <hr style="height: 1px;background-color: #83837f;border: none;">
+                            <% } %>
+                            <div style="display: flex; flex-direction: column; font-weight: 700;">
+                                <h6 class="mb-3"><b>Payment Method</b></h6>
+                                <div>
+                                    <input type="radio" id="COD" name="paymentMethod" value="COD" checked>
+                                    <label for="COD">Cash on Delivery</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="razorpay" name="paymentMethod" value="razorpay">
+                                    <label for="razorpay">Razorpay</label>
+                                </div>
+                            </div>
+
+                            <button onclick="submitForm()" class="site-btn">PLACE ORDER</button>
+                        </div>
+                    </div>
+                <% } %>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+
+<div class="modal fade top rounded-0" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+  aria-hidden="true" data-backdrop="true">
+  <div class="modal-dialog modal-dialog-centered modal-full-width modal-full-width" role="document">
+    <div class="modal-content rounded-0">
+      <div class="modal-header bg-danger rounded-0">
+        <h5 class="modal-title" id="successModalLabel">Payment failed</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Unfortunately couldn't complete payment</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+<script>
+async function submitForm() {
+    try {
+        const addressRadio = document.querySelector('input[name="addressId"]:checked');
+        const paymentMethodRadio = document.querySelector('input[name="paymentMethod"]:checked');
+        const walletCheckbox = document.querySelector('input[name="wallet"]:checked');
+        let walletAmount;
+        if (walletCheckbox) {
+            walletAmount = walletCheckbox.value;
+        }
+
+        if (!addressRadio || !paymentMethodRadio) {
+            alert("Please select an address and payment method.");
+            return;
+        }
+
+        const addressId = addressRadio.value;
+        const paymentMethod = paymentMethodRadio.value;
+
+        $("#checkout-form").submit((e) => {
+            e.preventDefault();
+            $.ajax({
+                url: '/place-order',
+                method: 'post',
+                data: { addressId, paymentMethod, walletAmount },
+                success: (order) => {
+                    if (order.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Placed!',
+                            text: 'Your order has been successfully placed.',
+                        }).then(() => {
+                            location.href = '/confirm-order';
+                        });
+                    }else if(order.outofStock){
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Order is not  Placed',
+                            text: 'Out of stock.',
+                        }).then(() => {
+                            location.href = '/cart';
+                        });
+                    } 
+                    else {
+                        razorpayPayment(order.payment);
+                    }
+                },
+            });
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+function razorpayPayment( order ) {
+
+    const rzp_key = '<%= process.env.RAZORPAY_KEY_ID %>'
+
+
+    var options = {
+        "key": rzp_key, // Enter the Key ID generated from the Dashboard
+        "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        "currency": "INR",
+        "name": "Male fashion", //your business name
+        "description": "Test Transaction",
+        "image": "/user/img/logo.png",
+        "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+        "handler": function (response){
+            verifyPayment( response, order )
+        },
+        "notes": {
+            "address": "Male fashion office"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+}
+
+async function verifyPayment(response, order) {
+    try {
+        const result = await axios.post('/verify-payment', {
+            response,
+            order,
+        });
+
+        if (result.data.paid) {
+            // Display SweetAlert for successful payment verification
+            Swal.fire({
+                icon: 'success',
+                title: 'Payment Verified!',
+                text: 'Your payment has been successfully verified. Your order is placed.',
+            }).then(() => {
+                // Redirect to the confirmation page
+                window.location = '/confirm-order';
+            });
+        } else {
+            // Redirect to orders page and display a modal
+            window.location = '/orders';
+
+            const modal = document.getElementById('modalCookie1');
+            const successModal = document.getElementById('successModal');
+
+            // Show the success modal
+            successModal.classList.add('show');
+            successModal.style.display = 'block';
+
+            // Hide the success modal when clicked anywhere
+            successModal.addEventListener('click', () => {
+                successModal.classList.remove('show');
+                successModal.style.display = 'none';
+            });
+        }
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+    </script>
+
+<%- include('../includes/userFooter.ejs') %>
+<%- include('../includes/end.ejs') %>
+
+
+

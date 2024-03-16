@@ -23,9 +23,18 @@ router.get('/resend-otp',authController.resendOtp)
 router.get('/forgotresendotp',authController.forgotresendOtp)
 
 
-router.get('/forgot-password',authController.forgotpassword)
-router.post('/postforgot-password',authController.postforgotpassword)
+router.get('/forgot-password',authController.getforgotpassword)
+router.post('/forgot-password',authController.forgotpassword)
+router.post( '/password-otp-verification', isAuth.userLoggedout, authController.forgotPasswordOtpVerification  )
+
 router.get('/adminsign',authController.adminsignUp)
 router.post('/adminsign',authController.postadminlogin)
+
+
+//user profile change password and the setting
+router.get('/change-password',isAuth.userAuth,authController.getuserChangePassword)
+router.post('/change-password',isAuth.userAuth,authController.changeUserPassword)
+router.post('/new-password', isAuth.userLoggedout, authController.newPassword)
+
 
 module.exports=router;
