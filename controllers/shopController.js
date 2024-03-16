@@ -6,7 +6,7 @@ const {search} = require('../routers/shopRouter')
 const cartSchema = require('../model/cartModel')
 const addressSchema = require('../model/addressModel')
 const userSchema = require('../model/userModels')
-
+const cartHelper = require('../helpers/cartHelper')
 
 module.exports = {
 
@@ -97,32 +97,58 @@ getSingleProduct : async(req,res)=>{
 
 
 
-getCheckOut : async (req,res) => {
-    try{
-        //extracting the user object from the session
-        const {user} = req.session
+// getCheckOut : async (req,res) => {
+//     try{
+//         //extracting the user object from the session
+//         const {user} = req.session
     
-        const cart = await cartSchema.findOne({userId : user})
-        const cartAmount = cart ? cart.subtotal : 0;
+//         const cart = await cartSchema.findOne({userId : user})
+//         const cartAmount = cart ? cart.subtotal : 0;
 
 
-        const userDetails = await userSchema.findOne({_id: user})
+//         const userDetails = await userSchema.findOne({_id: user})
         
         
-        const address = await userSchema.findOne({_id: user}).populate('address')
+//         const address = await userSchema.findOne({_id: user}).populate('address')
+//         const addresses = address.address.reverse()
+
+
+//         const flashMessage = req.flash()
+
+//         res.render('shop/checkout',{
+//             cartAmount: cartAmount,
+//            // subtotalAmount : subtotalAmount,
+//             address : addresses,
+//             user : userDetails,
+//             messages : flashMessage
+//         })
+//     }catch(error){
+//         console.log(error);
+//     }
+// },
+
+getCheckOut : async( req, res ) => {
+    try {
+        const { user } = req.session
+        const cartAmount = await cartHelper.totalCartPrice( user )
+        const cart = await cartSchema.findOne({ userId : user })
+        const userDetails = await userSchema.findOne({ _id : user })
+        let discounted
+        if( cart && cart.coupon && cartAmount && cartAmount.length > 0 ) {
+            discounted = await couponHelper.discountPrice( cart.coupon, cartAmount[0].total )
+        }
+        const address = await userSchema.findOne({ _id : user }).populate( 'address' )
         const addresses = address.address.reverse()
-
-
-        const flashMessage = req.flash()
-
-        res.render('shop/checkout',{
-            cartAmount: cartAmount,
-           // subtotalAmount : subtotalAmount,
+        const flashMessages = req.flash()
+        res.render( 'shop/checkout', {
+            cartAmount : cartAmount,
             address : addresses,
+            discounted : discounted,
             user : userDetails,
-            messages : flashMessage
+             messages: flashMessages 
+
         })
-    }catch(error){
+    } catch ( error ) {
         console.log(error);
     }
 },
