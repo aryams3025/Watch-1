@@ -1,0 +1,338 @@
+<%- include('../includes/userHead.ejs') %>
+<%- include('../includes/userNavbar.ejs') %>
+
+<style>
+    .main-div{
+        display: flex;
+        justify-content: center;
+
+    }
+    .profile-container {
+        /* border: .5px solid #6e6e6e2f; */
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+    }
+    section {
+        width: 80%;
+    }
+    .edit-image{
+        text-decoration: none;
+    }
+    input {
+        border-radius: 0!important;
+    }
+    input.form-control, textarea {
+        background-color: #fff;
+    }
+    input:disabled{
+        border: none;
+        background-color: #fff;
+        font-weight: bold;
+    }
+    .fs--1 a{
+        color: #7a7a7a;
+        padding: 10px;
+    }
+
+    .fs--1 a.active{
+        background-color: #7a7a7a;
+        color: #fff;
+    }
+    
+    .fs--1 a:hover {
+        background-color: #7a7a7a;
+        color: white;
+    }
+    .star-rating {
+            display: flex;
+        }
+
+        .star {
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        input[type="checkbox"]:checked+label {
+            color: gold;
+        }
+        .modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        padding: 20px;
+        max-width: 500px;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #007bff; /* Blue border */
+    }
+
+    .modal-title {
+        font-size: 1.5rem;
+        margin: 0;
+        color: #007bff; /* Blue text color */
+    }
+
+    .modal-body {
+        padding: 15px 0;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 15px;
+        border-top: 2px solid #007bff; /* Blue border */
+    }
+
+    .btn-secondary,
+    .btn-primary {
+        padding: 10px 20px;
+        margin-left: 10px;
+    }
+
+    .star-rating {
+        display: flex;
+    }
+
+    .star {
+        cursor: pointer;
+        margin-right: 5px;
+        font-size: 1.5rem;
+        color: #343a40;
+        transition: color 0.3s;
+    }
+
+    .star:hover,
+    .star.active {
+        color: #007bff; /* Blue color on hover/active */
+    }
+    .comment-label {
+        font-size: 1rem;
+        margin-bottom: 8px;
+        color: #343a40; /* Dark gray text color */
+    }
+
+    #comment {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        resize: vertical;
+    }
+
+</style>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+<div class="main-div mt-5 mb-5">
+    <section class="font-1">
+        <div class="">
+            <div class="row justify-content-center">
+                <div class="col-12">
+                    <div class="table" style="display: flex; flex-direction: column; justify-content: center;">
+                        <table>
+                            <thead>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Brand</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </thead>
+                            <tbody>
+                                <% for (let product of products) { %>
+                                    <% var total = product.price * product.quantity %>
+                                    <tr>
+                                        <td>
+                                            <img width="100" src="/images/product-images/<%= product.productId.image[0] %>" alt="">
+                                        </td>
+                                        <td><%= product.productId.name %></td>
+                                        <td><%= product.productId.brand.brand %></td>
+                                        <td><%= product.price %></td>
+                                        <td><%= product.quantity %></td>
+                                        <td><%= total %></td>
+                                        <% if(order.orderStatus==='Delivered') {%>
+                                        <td>  <a class="btn btn-secondary create-review-btn"
+                                            data-toggle="modal"
+                                            data-target="#createReviewModal"
+                                            data-product-id="<%= product.productId  %>"
+                                            onclick="setModalProductId('<%= product.productId._id %>')">
+                                            Write a Review
+                                        </a></td>
+                                       
+                                           <% } %>
+                                        </td>
+                                       
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                        <div class="pt-2">
+                            <a class="me-auto btn btn-outline-dark rounded-0" href="/user/orders">Back to orders</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<div class="modal" id="createReviewModal" tabindex="-1" role="dialog" aria-labelledby="createReviewModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createReviewModalLabel">Create Review</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="rating">Rating:</label>
+                <div class="star-rating" id="ratingStars">
+                    <input type="checkbox" id="star1" name="rating" value="1" />
+                    <label for="star1" class="star"><i class="fas fa-star"></i></label>
+
+                    <input type="checkbox" id="star2" name="rating" value="2" />
+                    <label for="star2" class="star"><i class="fas fa-star"></i></label>
+
+                    <input type="checkbox" id="star3" name="rating" value="3" />
+                    <label for="star3" class="star"><i class="fas fa-star"></i></label>
+
+                    <input type="checkbox" id="star4" name="rating" value="4" />
+                    <label for="star4" class="star"><i class="fas fa-star"></i></label>
+
+                    <input type="checkbox" id="star5" name="rating" value="5" />
+                    <label for="star5" class="star"><i class="fas fa-star"></i></label>
+                </div>
+                <br>
+
+                <label for="comment">Comment:</label>
+                <textarea id="comment" name="comment" rows="4" required></textarea>
+            </div>
+
+            <input type="hidden" id="modalProductId" name="productId">
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitReview()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    
+    
+    <script>
+        function setModalProductId(productId) {
+        
+            document.getElementById('modalProductId').value = productId;
+        }
+        </script>   
+  
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const stars = document.querySelectorAll('.star-rating input');
+
+            stars.forEach(function (star, index) {
+                star.addEventListener('click', function () {
+                    const clickedStarValue = parseInt(this.value);
+
+                    for (let i = 0; i <= index; i++) {
+                        stars[i].checked = true;
+                    }
+
+                    for (let i = index + 1; i < stars.length; i++) {
+                        stars[i].checked = false;
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        function submitReview() {
+            // Get the selected rating
+            const stars = document.querySelectorAll('.star-rating input:checked');
+            const rating = stars.length > 0 ? parseInt(stars[stars.length - 1].value) : 0;
+            const productId = document.getElementById('modalProductId').value
+            // Get the comment
+            const comment = document.getElementById('comment').value;
+
+            // Validate that a rating is selected
+            if (rating === 0 ) {
+                alert('Please select a rating before submitting.');
+                return;
+            }else if(comment==''){
+                alert('Please write your review')
+                return
+            }
+
+            // Create an object to hold the data
+            const reviewData = {
+                rating: rating,
+                comment: comment,
+                productId: productId
+            };
+
+            // Use fetch to send the data to the server
+            fetch('/createProductReview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(reviewData),
+            })
+            .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: "Review submitted successfully",
+                            icon: "success"
+                        });
+                    } else if (data.userExist) {
+                        Swal.fire({
+                            title: "You already posted the review",
+                            icon: "warning"
+                        });
+                    } 
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle errors (e.g., show error message)
+                })
+                .finally(() => {
+                    setTimeout(function(){
+                        window.location.reload();
+                    }, 1000);
+                    // Close the modal
+                    // const createReviewModal = new bootstrap.Modal(document.getElementById('createReviewModal'));
+                    // createReviewModal.hide();
+                });
+            }
+    </script
+
+
+
+<%- include('../includes/userFooter.ejs') %>
+<%- include('../includes/end.ejs') %>

@@ -25,6 +25,7 @@ router.post('/add-checkout-address',isAuth.userAuth,isBlocked.isBlocked,shopCont
 
 
 router.post('/place-order',isAuth.userAuth,isBlocked.isBlocked,orderController.placeOrder)
+router.get('/confirm-order',isAuth.userAuth,isBlocked.isBlocked,orderController.getConfirmOrder)
 
 
 
