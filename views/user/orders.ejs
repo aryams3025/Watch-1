@@ -1,0 +1,177 @@
+<%- include('../includes/userHead.ejs') %>
+<%- include('../includes/userNavbar.ejs') %>
+
+<style>
+  .shop-now a:hover {
+        color: #111;
+    }
+    .main-div{
+        display: flex;
+        justify-content: center;
+
+    }
+    .profile-container {
+        /* border: .5px solid #6e6e6e2f; */
+        box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+    }
+    section {
+        width: 80%;
+    }
+    .edit-image{
+        text-decoration: none;
+    }
+    input {
+        border-radius: 0!important;
+    }
+    input.form-control, textarea {
+        background-color: #fff;
+    }
+    input:disabled{
+        border: none;
+        background-color: #fff;
+        font-weight: bold;
+    }
+    .fs--1 a{
+        color: #7a7a7a;
+        padding: 10px;
+    }
+
+    .fs--1 a.active{
+        background-color: #7a7a7a;
+        color: #fff;
+    }
+    
+    .fs--1 a:hover {
+        background-color: #7a7a7a;
+        color: white;
+    }
+</style>
+<div class="main-div mt-5">
+<section class="font-1">
+    <div class="">
+        <div class="row justify-content-center">
+            <div class="col-lg-3">
+                
+            <% if(orders && orders.length>0){  %>
+            <div class="">
+                <div class="table">
+                    <table>
+                        <thead>
+                            <th>Date</th>
+                            
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th></th>
+                        </thead>
+                        <tbody>
+                            <% for ( let order of orders ){ %>
+                                <% var timeDiff = now - order.date  %>
+                                <% var days = timeDiff / ( 1000 * 60 * 60 * 24 ) %>
+
+                            <tr>
+                                <td>
+                                    <%= moment(order.date).format(shortDateFormat) %> 
+                                </td>
+                                
+                            <td> <%= order.totalPrice %></td>
+                            <td id="order-status-<%= order._id %>"><%= order.orderStatus %></td>
+                            <td> <% if( order.orderStatus === 'Delivered' || order.orderStatus === 'Cancelled' || order.orderStatus === 'Returned') { %><% } else { %> 
+                                    <button style="font-size: 12px;" id="cancel-<%= order._id %>" onclick="cancelOrder('<%= order._id %>')" class="btn btn-danger rounded-0"> Cancel</button> 
+                                <% } %>
+                                <% if(order.orderStatus === 'Delivered' && days < 30 ){ %>
+                                    <td>
+                                      <button 
+                                        style="font-size: 12px;" 
+                                        class="btn btn-primary rounded-0" 
+                                        onclick="confirmReturn('<%= order._id %>')"
+                                      >
+                                        Return
+                                      </button>
+                                    </td>
+                                  <% } %>
+                            </td>
+                            <% if(order.orderStatus === 'Delivered' || order.orderStatus==='Confirmed' || order.orderStatus==='Shipping'){ %>
+                                <td><a  style="font-size: 12px;" class="btn btn-success rounded-0" href="/invoice/<%= order._id %>">Invoice</a></td>
+                                <% } %>
+                            <td><a  style="font-size: 12px;" class="btn btn-dark rounded-0" href="/user/view-order-products/<%= order._id %>">View products</a></td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <% }else{ %>
+                  <div class="col-12 mt-5">
+                    <h2 class="text-center"><b>There is no Orders</b></h2>
+                    <br>
+                    <h3 class="text-center shop-now"><a href="/shop">Shop now</a></h3>
+                </div>
+                  <% } %>
+                </div>
+            </div>
+        </div>
+        <!--/.row-->
+    </div>
+    <!--/.container-->
+</section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+   async function cancelOrder(orderId) {
+  try {
+    const { value: confirmed } = await Swal.fire({
+      title: 'Cancel Order',
+      text: 'Are you sure you want to cancel this order?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, cancel it!'
+    });
+
+    if (confirmed) {
+      
+      const status = 'Cancelled';
+      const cancel = await axios.patch('/user/cancel-order', { orderId, status });
+
+      if (cancel.data.success) {
+        console.log(cancel.data);
+        const cancelButton = document.getElementById(`cancel-${orderId}`);
+        const order_status = document.getElementById(`order-status-${orderId}`);
+        cancelButton.style.display = 'none';
+        order_status.innerHTML = cancel.data.status;
+        Swal.fire({
+          icon: 'success',
+          title: 'Order Cancelled',
+          text: 'The order has been successfully cancelled!',
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+function confirmReturn(orderId) {
+    Swal.fire({
+      title: 'Return Order',
+      text: 'Are you sure you want to return this order?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, return it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = `/user/getReturn/${orderId}`;
+      }
+    });
+  }
+
+
+    
+</script>
+
+<div class="row overflow">
+    <%- include('../includes/userFooter.ejs') %>
+</div>
+<%- include('../includes/end.ejs') %>

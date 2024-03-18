@@ -68,7 +68,78 @@ module.exports = {
         }
     
     },
-    addToCart : async (req,res) =>{
+    // addToCart : async (req,res) =>{
+    //     try {
+    //         // Check if user is logged in
+    //         if (req.session.user) {
+    //             // If logged in
+    //             const userId = req.session.user;
+    //             const productId = req.body.productId;
+    
+    //             // Get stock quantity and product details
+    //             const product = await productSchema.findOne({ _id: productId });
+    //             const stockQuantity = product.quantity;
+    //             const maxQtyPerPerson = 5; // Setting maximum quantity per person to 5
+    
+    //             if (stockQuantity > 0) {
+    //                 // Check if cart exists
+    //                 let cart = await cartSchema.findOne({ userId: userId });
+    
+    //                 if (!cart) {
+    //                     // Create new cart for user
+    //                     cart = new cartSchema({
+    //                         userId: req.session.user,
+    //                         items: []
+    //                     });
+    //                     await cart.save();
+    //                 }
+    
+    //                 // Check if product already exists in cart
+    //                 const existingItem = cart.items.find(item => item.productId == productId);
+    
+    //                 if (existingItem) {
+    //                     // Calculate available quantity to add
+    //                     const availableQuantity = Math.min(stockQuantity - existingItem.quantity, maxQtyPerPerson - existingItem.quantity);
+    //                     if (availableQuantity > 0) {
+    //                         // Increase quantity
+    //                         await cartSchema.updateOne({ userId: userId, 'items.productId': productId },
+    //                             { $inc: { 'items.$.quantity': 1 } }
+    //                         );
+    //                         req.session.productCount++; // Increase product count in session
+    //                         return res.status(200).json({ success: true, message: 'Added to cart', login: true });
+    //                     } else {
+    //                         // If available quantity is 0, indicate that it's out of stock
+    //                         return res.json({ message: "Oops! It seems you've reached the maximum quantity of products available for purchase.", login: true, outOfStock: true });
+    //                     }
+    //                 } else {
+    //                     // Check if available quantity is greater than 0
+    //                     const availableQuantity = Math.min(stockQuantity, maxQtyPerPerson);
+    //                     if (availableQuantity > 0) {
+    //                         // Add new item to cart
+    //                         await cartSchema.updateOne({ userId: userId },
+    //                             { $push: { items: { productId: productId, quantity: 1 } } }
+    //                         );
+    //                         req.session.productCount++; // Increase product count in session
+    //                         return res.json({ success: true, message: 'Added to cart', login: true });
+    //                     } else {
+    //                         // If product is out of stock
+    //                         return res.json({ error: true, message: 'Out of stock', login: true, outOfStock: true });
+    //                     }
+    //                 }
+    //             } else {
+    //                 // If product is out of stock
+    //                 res.json({ error: true, message: 'Out of stock', login: true, outOfStock: true });
+    //             }
+    //         } else {
+    //             // If user is not logged in
+    //             res.json({ login: false });
+    //         }
+    //     } catch (error) {
+    //         res.redirect('/500');
+    //     }
+    // },
+
+    addToCart: async (req, res) => {
         try {
             // Check if user is logged in
             if (req.session.user) {
@@ -106,6 +177,14 @@ module.exports = {
                                 { $inc: { 'items.$.quantity': 1 } }
                             );
                             req.session.productCount++; // Increase product count in session
+                            
+                            // Display a SweetAlert for successfully adding item to cart
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'The selected product has been added to your cart.',
+                            });
+                            
                             return res.status(200).json({ success: true, message: 'Added to cart', login: true });
                         } else {
                             // If available quantity is 0, indicate that it's out of stock
@@ -120,6 +199,14 @@ module.exports = {
                                 { $push: { items: { productId: productId, quantity: 1 } } }
                             );
                             req.session.productCount++; // Increase product count in session
+                            
+                            // Display a SweetAlert for successfully adding item to cart
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'The selected product has been added to your cart.',
+                            });
+                            
                             return res.json({ success: true, message: 'Added to cart', login: true });
                         } else {
                             // If product is out of stock
@@ -138,6 +225,7 @@ module.exports = {
             res.redirect('/500');
         }
     },
+    
 
     deCart : async(req,res) =>{
         try {

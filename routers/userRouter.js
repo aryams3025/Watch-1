@@ -1,5 +1,6 @@
 const express = require('express')
 const userController = require('../controllers/userController')
+const orderController = require('../controllers/orderController')
 const router = express.Router();
 
 const isAuth = require('../middleware/isAuth')
@@ -17,4 +18,12 @@ router.get('/edit-address/:id', isAuth.userAuth, userController.getEditAddress)
 router.post('/edit-address',isAuth.userAuth,userController.editAddress)
 
 router.patch('/remove-address/:id',isAuth.userAuth,userController.    removeAddress)
+
+router.get('/orders',isAuth.userAuth,isBlocked.isBlocked,orderController.getOrder)
+router.get('/view-order-products/:id',isAuth.userAuth,isBlocked.isBlocked,orderController.userOrderProducts)
+router.patch('/cancel-order',isAuth.userAuth,isBlocked.isBlocked,orderController.cancelOrder)
+router.get('/getReturn/:id',isAuth.userAuth,isBlocked.isBlocked,orderController.getreturnOrder)
+
+
+router.post( '/return-order', isAuth.userAuth,isBlocked.isBlocked, orderController.returnOrder )
 module.exports = router;
