@@ -239,6 +239,14 @@ module.exports={
             console.log(error);
         }
     },
+    doAdminLogout:(req,res)=>{
+        try{
+            req.session.admin=null
+            res.redirect('/admin-login')
+        }catch(error){
+            res.redirect('/500')
+        }
+    },
     getforgotpassword : async(req,res)=>{
         res.render('auth/forgot-password')
     },

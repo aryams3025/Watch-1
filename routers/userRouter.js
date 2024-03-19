@@ -22,8 +22,8 @@ router.patch('/remove-address/:id',isAuth.userAuth,userController.    removeAddr
 router.get('/orders',isAuth.userAuth,isBlocked.isBlocked,orderController.getOrder)
 router.get('/view-order-products/:id',isAuth.userAuth,isBlocked.isBlocked,orderController.userOrderProducts)
 router.patch('/cancel-order',isAuth.userAuth,isBlocked.isBlocked,orderController.cancelOrder)
-router.get('/getReturn/:id',isAuth.userAuth,isBlocked.isBlocked,orderController.getreturnOrder)
+// router.get('/getReturn/:id',isAuth.userAuth,isBlocked.isBlocked,orderController.getreturnOrder)
 
 
-router.post( '/return-order', isAuth.userAuth,isBlocked.isBlocked, orderController.returnOrder )
+// router.post( '/return-order', isAuth.userAuth,isBlocked.isBlocked, orderController.returnOrder )
 module.exports = router;

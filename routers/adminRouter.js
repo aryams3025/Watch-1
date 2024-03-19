@@ -11,7 +11,11 @@ const isAuth = require('../middleware/isAuth.js')
 const categoryContoller = require('../controllers/categoryContoller.js')
 const brandController = require('../controllers/brandController.js')
 const couponController = require('../controllers/couponController.js')
+const orderController = require('../controllers/orderController.js')
 
+
+
+router.get( '/logout', isAuth.adminAuth,authController.doAdminLogout )
 router.get('/user-list',isAuth.adminAuth,adminController.usersList)
 router.patch('/block-user/:id',isAuth.adminAuth,adminController.blockUser)
 router.patch('/unblock-user/:id',isAuth.adminAuth,adminController.unblockUser)
@@ -49,6 +53,13 @@ router.get('/unlist-product/:id',isAuth.adminAuth,productController.unlistProduc
 
 
 router.get('/delete-image',isAuth.adminAuth,productController.deleteImage)
+
+
+router.get('/orders',isAuth.adminAuth,orderController.getAdminOrderList)
+router.get('/order-products/:id',isAuth.adminAuth.orderController.orderDetails)
+
+
+
 
 
 router.get('/coupons',isAuth.adminAuth,couponController.getCoupons)
