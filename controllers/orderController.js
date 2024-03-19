@@ -299,46 +299,113 @@ module.exports = {
             console.log(error);
         }
     },
-    getreturnOrder : async(req,res) =>{
-        const orderId=req.params.id
-    console.log(orderId)
-    res.render('shop/return',{orderId:orderId})
-    },
+    // getreturnOrder : async(req,res) =>{
+    //     const orderId=req.params.id
+    // console.log(orderId)
+    // res.render('shop/return',{orderId:orderId})
+    // },
 
-    returnOrder:async(req,res)=>{
-        const orderId=req.query.orderId
-        const {user}=req.session
-        const reason=req.body.returnReason
-        const message=req.body.message
-        const order=await orderSchema.findOne({_id:orderId})
-        if(reason === 'Other'){
-            for(let products of order.products){
-                await productSchema.updateOne({_id:products.productId},{
-                    $inc:{
-                        quantity: products.quantity
-                    }
-                })
-            }
-        }
-        await orderSchema.updateOne({_id:orderId},{
-            $set:{
-                orderStatus:'Returned',ReturnReason:message
-            }
-        })
-        await userSchema.updateOne({_id:user},{
-            $inc:{
-                wallet:order.totalPrice
-            },
-            $push:{
-                walletHistory:{
-                    date:new Date(),
-                    amount:order.totalPrice,
-                    message:"Deposit on return"
-                }
-            }
-        },)
-        res.redirect('/user/orders')
+    // returnOrder:async(req,res)=>{
+    //     const orderId=req.query.orderId
+    //     const {user}=req.session
+    //     const reason=req.body.returnReason
+    //     const message=req.body.message
+    //     const order=await orderSchema.findOne({_id:orderId})
+    //     if(reason === 'Other'){
+    //         for(let products of order.products){
+    //             await productSchema.updateOne({_id:products.productId},{
+    //                 $inc:{
+    //                     quantity: products.quantity
+    //                 }
+    //             })
+    //         }
+    //     }
+    //     await orderSchema.updateOne({_id:orderId},{
+    //         $set:{
+    //             orderStatus:'Returned',ReturnReason:message
+    //         }
+    //     })
+    //     await userSchema.updateOne({_id:user},{
+    //         $inc:{
+    //             wallet:order.totalPrice
+    //         },
+    //         $push:{
+    //             walletHistory:{
+    //                 date:new Date(),
+    //                 amount:order.totalPrice,
+    //                 message:"Deposit on return"
+    //             }
+    //         }
+    //     },)
+    //     res.redirect('/user/orders')
         
-       }
+    //    }
 
+
+
+    getAdminOrderList : async(req,res) =>{
+        try{
+            const {sortData , sortOrder} = req.query
+            let page = Number(req.query.page)
+            if(isNaN(page) || page < 1){
+                page = 1
+            }
+            const sort = {}
+            if(sortData) {
+                if(sortOrder === "Ascending"){
+                    sort[sortData] = 1
+                }else{
+                    sort[sortData] = -1
+                }
+            }else{
+                sort['date'] = -1
+            }
+
+            const ordersCount = await orderSchema.find().count()
+            const orders = await orderSchema.find().sort(sort)
+            .skip((page - 1)*paginationHelper.ORDER_PER_PAGE)
+            .populate('userId')
+            .populate('products.productId')
+            .populate('address')
+
+            res.render('admin/orders',{
+                orders : orders,
+                admin : true,
+                currentPage : page ,
+                currentPage : page * paginationHelper.ORDER_PER_PAGE < ordersCount,
+                hasPrevPage : page > 1,
+                
+                hasNextPage : page + 1,
+                nextPage : page + 1 ,
+                prevPage : page -1 ,
+                lastPage : Math.ceil(ordersCount / paginationHelper.ORDER_PER_PAGE),
+                sortData : sortData,
+                sortOrder : sortOrder 
+            })
+        }catch(error){
+            console.log(error);
+        }
+    },
+    orderDetails : async(req,res) =>{
+        try{
+            const {id} = req.params
+            const order = await orderSchema.findOne({_id:id})
+            .populate('products.productId')
+            .populate('address')
+            .populate({
+                path : 'produts.productId',
+                populate : {
+                    path : 'brand'
+                }
+            })
+
+            res.render('admin/order-products',{
+                order : order ,
+                 products : order.products,
+                 admin : true
+            })
+        }catch(error){
+            console.log(error);
+        }
+    }
 }
