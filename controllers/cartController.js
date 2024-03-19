@@ -8,66 +8,66 @@ const {getProductDetails } = require('./productController');
 
 
 module.exports = {
-    getCart : async (req,res) =>{
-        try {
-            // Extracting user session
-            const { user } = req.session;
+    // getCart : async (req,res) =>{
+    //     try {
+    //         // Extracting user session
+    //         const { user } = req.session;
     
     
-            // Updating the quantities in the cart and documenting product count in session if necessary
-            const productCount = await cartHelper.updateQuantity(user);
-            if (productCount) {
-                req.session.productCount--;
-            }
+    //         // Updating the quantities in the cart and documenting product count in session if necessary
+    //         const productCount = await cartHelper.updateQuantity(user);
+    //         if (productCount) {
+    //             req.session.productCount--;
+    //         }
     
     
-            // Then retrieving updated cart with populated product information
-            const updatedCart = await cartSchema.findOne({ userId: user })
-                .populate({
-                    path: 'items.productId',
-                    populate: {
-                        path: 'category'
-                    }
-                });
+    //         // Then retrieving updated cart with populated product information
+    //         const updatedCart = await cartSchema.findOne({ userId: user })
+    //             .populate({
+    //                 path: 'items.productId',
+    //                 populate: {
+    //                     path: 'category'
+    //                 }
+    //             });
     
     
-            // Calculate total price of the cart
-            const totalPrice = await cartHelper.totalCartPrice(user);
+    //         // Calculate total price of the cart
+    //         const totalPrice = await cartHelper.totalCartPrice(user);
     
     
-            // Define the variable to store discounted total
-            let discounted = {
-                discountAmount: 0,
-                discountedTotal: totalPrice[0].total // Initialize with the total price
-            };
+    //         // Define the variable to store discounted total
+    //         let discounted = {
+    //             discountAmount: 0,
+    //             discountedTotal: totalPrice[0].total // Initialize with the total price
+    //         };
     
     
-            // Calculate discounted total if cart contains items
-            if (updatedCart && updatedCart.items.length > 0) {
-                discounted.discountAmount = updatedCart.items.reduce((totalDiscount, item) => {
-                    // Calculate discounted price for each item
-                    const discountedPrice = item.productId.price * (1 - item.productId.discount / 100);
-                    // Calculate discount amount for this item
-                    const discountAmountForItem = (item.productId.price - discountedPrice) * item.quantity;
-                    return totalDiscount + discountAmountForItem;
-                }, 0);
-                discounted.discountedTotal -= discounted.discountAmount; // Subtract discount from total
-            }
+    //         // Calculate discounted total if cart contains items
+    //         if (updatedCart && updatedCart.items.length > 0) {
+    //             discounted.discountAmount = updatedCart.items.reduce((totalDiscount, item) => {
+    //                 // Calculate discounted price for each item
+    //                 const discountedPrice = item.productId.price * (1 - item.productId.discount / 100);
+    //                 // Calculate discount amount for this item
+    //                 const discountAmountForItem = (item.productId.price - discountedPrice) * item.quantity;
+    //                 return totalDiscount + discountAmountForItem;
+    //             }, 0);
+    //             discounted.discountedTotal -= discounted.discountAmount; // Subtract discount from total
+    //         }
     
     
-            res.render('shop/cart', {
-                cartItems: updatedCart,
-                totalAmount: totalPrice,
-                discounted: discounted
-            });
+    //         res.render('shop/cart', {
+    //             cartItems: updatedCart,
+    //             totalAmount: totalPrice,
+    //             discounted: discounted
+    //         });
     
     
-        } catch (error) {
-            console.log(error);
-            // Handle errors appropriately
-        }
+    //     } catch (error) {
+    //         console.log(error);
+    //         // Handle errors appropriately
+    //     }
     
-    },
+    // },
     // addToCart : async (req,res) =>{
     //     try {
     //         // Check if user is logged in
@@ -138,6 +138,65 @@ module.exports = {
     //         res.redirect('/500');
     //     }
     // },
+
+    getCart : async (req, res) => {
+        try {
+            // Extracting user session
+            const { user } = req.session;
+    
+            // Updating the quantities in the cart and documenting product count in session if necessary
+            const productCount = await cartHelper.updateQuantity(user);
+            if (productCount) {
+                req.session.productCount--;
+            }
+    
+            // Then retrieving updated cart with populated product information
+            const updatedCart = await cartSchema.findOne({ userId: user })
+                .populate({
+                    path: 'items.productId',
+                    populate: {
+                        path: 'category'
+                    }
+                });
+    
+            // Calculate total price of the cart
+            const totalPrice = await cartHelper.totalCartPrice(user);
+    
+            // Define the variable to store discounted total
+            let discounted = {
+                discountAmount: 0,
+                discountedTotal: 0 // Initialize with a default value
+            };
+    
+            // Check if totalPrice is defined and not empty
+            if (totalPrice && totalPrice.length > 0 && totalPrice[0].total !== undefined) {
+                // Assign total only if it exists
+                discounted.discountedTotal = totalPrice[0].total;
+            }
+    
+            // Calculate discounted total if cart contains items
+            if (updatedCart && updatedCart.items.length > 0) {
+                discounted.discountAmount = updatedCart.items.reduce((totalDiscount, item) => {
+                    // Calculate discounted price for each item
+                    const discountedPrice = item.productId.price * (1 - item.productId.discount / 100);
+                    // Calculate discount amount for this item
+                    const discountAmountForItem = (item.productId.price - discountedPrice) * item.quantity;
+                    return totalDiscount + discountAmountForItem;
+                }, 0);
+                discounted.discountedTotal -= discounted.discountAmount; // Subtract discount from total
+            }
+    
+            res.render('shop/cart', {
+                cartItems: updatedCart,
+                totalAmount: totalPrice,
+                discounted: discounted
+            });
+    
+        } catch (error) {
+            console.log(error);
+            // Handle errors appropriately
+        }
+    },
 
     addToCart: async (req, res) => {
         try {

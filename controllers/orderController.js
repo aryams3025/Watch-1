@@ -393,7 +393,7 @@ module.exports = {
             .populate('products.productId')
             .populate('address')
             .populate({
-                path : 'produts.productId',
+                path : 'products.productId',
                 populate : {
                     path : 'brand'
                 }
@@ -407,5 +407,26 @@ module.exports = {
         }catch(error){
             console.log(error);
         }
-    }
+    },
+    // changeOrderStatus : async(req,res) =>{
+    //     try{
+    //         const {status,orderId} = req.body
+    //         if(status === 'Cancelled'){
+    //             // if the order is cancelled 
+    //             const order = await orderSchema.findOne({_id : orderId})
+    //             for(let produts of order.products){
+    //                 await productSchema.updateOne({_id : products.productId},{$inc : {quantity : products.quantity}})
+
+    //             }
+    //             await orderSchema.findOneAndUpdate({_id : orderId},{$set : {orderStatus : status}})
+    //         }else {
+    //             await orderSchema.findOneAndUpdate({_id : orderId},{$set : {orderStatus : status}})
+    //         }
+
+    //         const newStatus = await orderSchema.findOne({_id : orderId})
+    //         res.status(200).json({success : true , status : newStatus.orderStatus})
+    //     }catch(error){
+    //         console.log(error);
+    //     }
+    // }
 }
