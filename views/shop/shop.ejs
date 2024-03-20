@@ -161,7 +161,7 @@
                                 <p class="mb-0"><del>₹ <%= product.price %></del></p>
 
                                 <h5 class="mb-0">₹ <%= product.price - product.discount %> <span class="badge badge-success"> Save ₹ <%= product.discount %> </span></h5>
-                                <!-- <% if ( product.offer && !product.category.offer){ var discount = (product.price * product.offer.percentage / 100).toFixed(0) } else if ( product.category.offer && !product.offer ) {var discount = ( product.price * product.category.offer.percentage / 100 ).toFixed(0) }else if ( product.category.offer && product.offer ){
+                                <% if ( product.offer && !product.category.offer){ var discount = (product.price * product.offer.percentage / 100).toFixed(0) } else if ( product.category.offer && !product.offer ) {var discount = ( product.price * product.category.offer.percentage / 100 ).toFixed(0) }else if ( product.category.offer && product.offer ){
                                     if(product.offer.percentage<product.category.offer.percentage){
                                      {var discount = ( product.price * product.category.offer.percentage / 100 ).toFixed(0) }}
                                     else{
@@ -250,124 +250,12 @@
 
 
 
-// <script>
-//     document.addEventListener("DOMContentLoaded", function () {
-//         // Get the values of 'cat' and 'brand' from the current URL
-//         var urlParams = new URLSearchParams(window.location.search);
-//         var catValue = urlParams.get('cat');
-//         var brandValue = urlParams.get('brand');
-
-//         // Get all the anchor elements inside the categories
-//         var categoryLinks = document.querySelectorAll(".shop__sidebar__categories ul li a");
-
-//         categoryLinks.forEach(function (link) {
-//             var href = link.getAttribute("href");
-
-//             // Check if the href attribute of the link matches the 'cat' value from the current URL or 'All' is selected by default
-//             if (!catValue || (catValue && href.includes('cat=' + catValue))) {
-//                 // Change the color to black or any other desired style for category links
-//                 link.style.color = "black";
-//             }
-//         });
-
-//         // Get all the anchor elements inside the brands
-//         var brandLinks = document.querySelectorAll(".shop__sidebar__brand ul li a");
-
-//         brandLinks.forEach(function (link) {
-//             var href = link.getAttribute("href");
-
-//             // Check if the href attribute of the link matches the 'brand' value from the current URL or 'All' is selected by default
-//             if (!brandValue || (brandValue && href.includes('brand=' + brandValue))) {
-//                 // Change the color to black or any other desired style for brand links
-//                 link.style.color = "black";
-//             }
-//         });
-//     });
-//  async function addToCart( productId ){ 
-
-//         try {
-           
-    
-
-//             const response = await axios.post('/add-to-cart', { productId });
-//             if( !response.data.login ) {
-//                 return window.location.href = '/login'
-//             } 
-//             if( response.data.outOfStock ) {
-//                 const bdy = document.body
-//                 const modal = document.getElementById('modalCookie1')
-//                 const successModal = document.getElementById("successModal");
-
-//                 // Show the success modal
-//                 successModal.classList.add("show");
-//                 successModal.style.display = "block";
-//                 bdy.style.overflow = 'hidden'
-                
-//                 // Hide the success modal when clicked anywhere
-//                 successModal.addEventListener("click", () => {
-//                     successModal.classList.remove("show");
-//                     successModal.style.display = "none";
-//                     bdy.style.overflow = 'auto'
-                    
-//                 });
-//             }
-//             if( response.data.newItem === true ){
-                
-//                 const count = document.getElementById('cartCount')
-                
-//                 currentCount = parseInt( count.innerHTML )
-                
-//                 updatedCount = currentCount + 1
-//                 count.innerHTML = updatedCount    
-                
-//                 Swal.fire({
-//             title: 'Product Added to Cart',
-//             text: 'The selected product has been added to your cart.',
-//             icon: 'success',
-//             confirmButtonColor: '#28a745',
-//             confirmButtonText: 'OK'
-//         });
-
-               
-//             }
-//         } catch ( error ) {
-//             console.log(error.message);
-//         }
-//     }
 
 
-//      function sortProductsByPrice(sortOrder) {
-//         const currentUrl = window.location.href;
-//         const url = new URL(currentUrl);
-//         const params = new URLSearchParams(url.search);
-
-//         if (sortOrder === 'low_to_high') {
-//             params.set('sort', 'price_low_to_high');
-//         } else if (sortOrder === 'high_to_low') {
-//             params.set('sort', 'price_high_to_low');
-//         }
-
-//         window.location.href = '/shop?' + params.toString();
-//     }
-
-//     function sortProductsByName(sortOrder) {
-//         const currentUrl = window.location.href;
-//         const url = new URL(currentUrl);
-//         const params = new URLSearchParams(url.search);
-
-//         if (sortOrder === 'aA_to_zZ') {
-//             params.set('sort', 'name_aA_to_zZ');
-//         } else if (sortOrder === 'Aa_to_Zz') {
-//             params.set('sort', 'name_Aa_to_Zz');
-//         }
-
-//         window.location.href = '/shop?' + params.toString();
-//     }
-// </script>
 
 <script>
+
     document.addEventListener("DOMContentLoaded", async function () {
-        // Get the values of 'cat' and 'brand' from the current URL
         var urlParams = new URLSearchParams(window.location.search);
         var catValue = urlParams.get('cat');
         var brandValue = urlParams.get('brand');
@@ -426,6 +314,7 @@
                 currentCount = parseInt(count.innerHTML);
                 updatedCount = currentCount + 1;
                 count.innerHTML = updatedCount;
+                window.location.reload()
 
                 Swal.fire({
                     title: 'Product Added to Cart',

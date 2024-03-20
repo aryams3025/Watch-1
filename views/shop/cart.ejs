@@ -239,6 +239,7 @@
             const price = Number(priceTag[1])
             const totalNumber = Number(currentTotal [1])
             const cancel=document.getElementById('cancel')
+            window.location.reload();
             if(cancel){
                 Swal.fire({
             icon: 'Warning',
@@ -251,7 +252,7 @@
             else{
             const total = document.getElementById(`total-${productId}`)
             const response = await axios.post('/add-to-cart',{productId})
-            console.log(response)
+            
             if( !response.data.login ){
                 return window.location.href = '/login'
             } 
@@ -274,6 +275,7 @@
                 });
             }
             if( response.data.success === true){
+                console.log('hai')
                 window.location.reload();
                 const currentQty = parseInt(qty.val())
                 const updatedQty = currentQty + 1;
@@ -281,7 +283,6 @@
                 updatedQty > 2 ? dec.show() : null ;
                 totalCartPrice.innerHTML = `₹ ${response.data.totalPrice[0].total}`
                 subtotalCartPrice.innerHTML = `₹ ${response.data.totalPrice[0].total}`
-               
                 qty.val(updatedQty);
                 if( response.data.discounted ) {
                     totalCartPrice.innerHTML = `₹ ${response.data.discounted.discountedTotal}`
@@ -291,6 +292,7 @@
                 }
                 
             }  
+            
         }
             
         } catch (error) {
@@ -342,7 +344,6 @@
                         totalCartPrice.innerHTML = `₹ ${response.data.totalPrice[0].total}`
                         subtotalCartPrice.innerHTML = `₹ ${response.data.totalPrice[0].total}`
                         qty.val(updatedQty)
-                        
                         if( response.data.discounted ) {
                             
                             totalCartPrice.innerHTML = `₹ ${response.data.discounted.discountedTotal}`
