@@ -91,7 +91,8 @@
                                   <% } %>
                             </td>
                             <% if(order.orderStatus === 'Delivered' || order.orderStatus==='Confirmed' || order.orderStatus==='Shipping'){ %>
-                                <td><a  style="font-size: 12px;" class="btn btn-success rounded-0" href="/invoice/<%= order._id %>">Invoice</a></td>
+                              <!-- href="/invoice/= order._id > -->
+                                <td><a  style="font-size: 12px;" class="btn btn-success rounded-0" >Invoice</a></td>
                                 <% } %>
                             <td><a  style="font-size: 12px;" class="btn btn-dark rounded-0" href="/user/view-order-products/<%= order._id %>">View products</a></td>
                             </tr>

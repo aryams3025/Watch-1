@@ -10,68 +10,151 @@ const cartHelper = require('../helpers/cartHelper')
 
 module.exports = {
 
-    getShop:async(req,res)=>{
-        try{
-            const {cat,brand,search}=req.query
-            const userLoggedin=req.session.user
-            let page=Number(req.query.page);
-            if(isNaN(page)|| page<1){
-                page=1;
+    // getShop:async(req,res)=>{
+    //     try{
+    //         const {cat,brand,search}=req.query
+    //         const userLoggedin=req.session.user
+    //         let page=Number(req.query.page);
+    //         if(isNaN(page)|| page<1){
+    //             page=1;
+    //         }
+    //         const condition = {
+    //             status: true
+    //           };
+    //           if(cat){
+    //             condition.category=cat
+    //         }
+    //         if(brand){
+    //             condition.brand=brand
+    //         }
+    //         if(search){
+    //             condition.$or=[
+    //                 {name:{$regex:search,$options:"i"}},
+    //                 {description:{$regex:search,$options:"i"}}
+    //             ]
+    //         }
+    //         const productCount=await productSchema.find(condition).count()
+    //         const products = await productSchema.find(condition)
+    //         .populate({
+    //             path: "category",
+    //             match: { status: true }
+    //         })
+    //         .populate({
+    //             path: "brand",
+    //             match: { status: true }
+    //         })
+    //         .skip((page - 1) * paginationHelper.ITEMS_PER_PAGE)
+    //         .limit(paginationHelper.ITEMS_PER_PAGE);
+    //         const filteredProducts = products.filter(product => product.category && product.brand);  // Pagination
+    //         const category = await categorySchema.find({ status: true }) 
+    //         const brands = await brandSchema.find({status:true})
+    //         const startingNo = (( page - 1) * paginationHelper.ITEMS_PER_PAGE ) + 1
+    //         const endingNo = Math.min(startingNo + paginationHelper.ITEMS_PER_PAGE)
+    //         res.render( 'shop/shop', {
+    //             userLoggedin:userLoggedin,
+    //             products  : filteredProducts,
+    //             category : category,
+    //             brands : brands,
+    //             totalCount : productCount,
+    //             currentPage : page,
+    //             hasNextPage : page * paginationHelper.ITEMS_PER_PAGE < productCount, // Checks is there is any product to show to next page
+    //             hasPrevPage : page > 1,
+    //             nextPage : page + 1,
+    //             prevPage : page -1,
+    //             lastPage : Math.ceil( productCount / paginationHelper.ITEMS_PER_PAGE||1 ),
+    //             startingNo : startingNo,
+    //             endingNo : endingNo,
+    //             cat : cat,
+    //             brand : brand,
+    //             search : search
+    //         })
+    //     }catch(error){
+    //         res.redirect('/500')
+    //     }
+    // },
+
+
+    getShop: async (req, res) => {
+        try {
+            const { cat, brand, search, sort } = req.query;
+            const userLoggedin = req.session.user;
+            let page = Number(req.query.page);
+            if (isNaN(page) || page < 1) {
+                page = 1;
             }
             const condition = {
                 status: true
-              };
-              if(cat){
-                condition.category=cat
+            };
+            if (cat) {
+                condition.category = cat;
             }
-            if(brand){
-                condition.brand=brand
+            if (brand) {
+                condition.brand = brand;
             }
-            if(search){
-                condition.$or=[
-                    {name:{$regex:search,$options:"i"}},
-                    {description:{$regex:search,$options:"i"}}
-                ]
+            if (search) {
+                condition.$or = [
+                    { name: { $regex: search, $options: "i" } },
+                    { description: { $regex: search, $options: "i" } }
+                ];
             }
-            const productCount=await productSchema.find(condition).count()
+    
+            // Sort condition based on the value of 'sort'
+            let sortCondition = {};
+            if (sort === 'price_low_to_high') {
+                sortCondition = { price: 1 };
+            } else if (sort === 'price_high_to_low') {
+                sortCondition = { price: -1 };
+            } else if (sort === 'name_aA_to_zZ') {
+                sortCondition = { name: 1 };
+            } else if (sort === 'name_Aa_to_Zz') {
+                sortCondition = { name: -1 };
+            }
+
+            
+    
+            const productCount = await productSchema.find(condition).countDocuments();
             const products = await productSchema.find(condition)
-            .populate({
-                path: "category",
-                match: { status: true }
-            })
-            .populate({
-                path: "brand",
-                match: { status: true }
-            })
-            .skip((page - 1) * paginationHelper.ITEMS_PER_PAGE)
-            .limit(paginationHelper.ITEMS_PER_PAGE);
+                .populate({
+                    path: "category",
+                    match: { status: true }
+                })
+                .populate({
+                    path: "brand",
+                    match: { status: true }
+                })
+                .sort(sortCondition) // Apply sorting
+                .skip((page - 1) * paginationHelper.ITEMS_PER_PAGE)
+                .limit(paginationHelper.ITEMS_PER_PAGE);
+    
             const filteredProducts = products.filter(product => product.category && product.brand);  // Pagination
-            const category = await categorySchema.find({ status: true }) 
-            const brands = await brandSchema.find({status:true})
-            const startingNo = (( page - 1) * paginationHelper.ITEMS_PER_PAGE ) + 1
-            const endingNo = Math.min(startingNo + paginationHelper.ITEMS_PER_PAGE)
-            res.render( 'shop/shop', {
-                userLoggedin:userLoggedin,
-                products  : filteredProducts,
-                category : category,
-                brands : brands,
-                totalCount : productCount,
-                currentPage : page,
-                hasNextPage : page * paginationHelper.ITEMS_PER_PAGE < productCount, // Checks is there is any product to show to next page
-                hasPrevPage : page > 1,
-                nextPage : page + 1,
-                prevPage : page -1,
-                lastPage : Math.ceil( productCount / paginationHelper.ITEMS_PER_PAGE||1 ),
-                startingNo : startingNo,
-                endingNo : endingNo,
-                cat : cat,
-                brand : brand,
-                search : search
-            })
-        }catch(error){
-            res.redirect('/500')
+            const category = await categorySchema.find({ status: true });
+            const brands = await brandSchema.find({ status: true });
+            const startingNo = ((page - 1) * paginationHelper.ITEMS_PER_PAGE) + 1;
+            const endingNo = Math.min(startingNo + paginationHelper.ITEMS_PER_PAGE);
+            res.render('shop/shop', {
+                userLoggedin: userLoggedin,
+                products: filteredProducts,
+                category: category,
+                brands: brands,
+                totalCount: productCount,
+                currentPage: page,
+                hasNextPage: page * paginationHelper.ITEMS_PER_PAGE < productCount, // Checks if there is any product to show to next page
+                hasPrevPage: page > 1,
+                nextPage: page + 1,
+                prevPage: page - 1,
+                lastPage: Math.ceil(productCount / paginationHelper.ITEMS_PER_PAGE || 1),
+                startingNo: startingNo,
+                endingNo: endingNo,
+                cat: cat,
+                brand: brand,
+                search: search,
+                sort: sort // Pass sort parameter to maintain sorting state in the UI
+            });
+        } catch (error) {
+            res.redirect(error);
         }
     },
+    
 getSingleProduct : async(req,res)=>{
     try{
         const product = await productSchema.find({ _id : req.params.id, status : true })
