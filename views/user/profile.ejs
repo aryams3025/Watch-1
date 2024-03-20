@@ -149,7 +149,7 @@
         
         console.log(firstName, mobile, lastName);
 
-        const response = await axios.put('/user/edit-profile', { firstName, lastName, mobile })
+        const response = await axios.post('/user/edit-profile', { firstName, lastName, mobile })
         if (response.data.success) {
             const inp = document.querySelectorAll('.col-md-9 input')
             const save = document.getElementById('save')

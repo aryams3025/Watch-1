@@ -76,7 +76,7 @@ module.exports = {
 
     getShop: async (req, res) => {
         try {
-            const { cat, brand, search, sort } = req.query;
+            const { cat, brand, search, sort , hideOutOfStock } = req.query;
             const userLoggedin = req.session.user;
             let page = Number(req.query.page);
             if (isNaN(page) || page < 1) {
@@ -97,6 +97,10 @@ module.exports = {
                     { description: { $regex: search, $options: "i" } }
                 ];
             }
+
+            if (hideOutOfStock === 'true') { // If hideOutOfStock is set to 'true', filter out products with quantity 0
+                condition.quantity = { $gt: 0 };
+            }
     
             // Sort condition based on the value of 'sort'
             let sortCondition = {};
@@ -108,6 +112,8 @@ module.exports = {
                 sortCondition = { name: 1 };
             } else if (sort === 'name_Aa_to_Zz') {
                 sortCondition = { name: -1 };
+            }else if (sort === 'popularity') {
+                sortCondition = { popularity: -1 }; // Sorting by popularity in descending order
             }
 
             
@@ -148,7 +154,8 @@ module.exports = {
                 cat: cat,
                 brand: brand,
                 search: search,
-                sort: sort // Pass sort parameter to maintain sorting state in the UI
+                sort: sort, // Pass sort parameter to maintain sorting state in the UI
+                hideOutOfStock: hideOutOfStock
             });
         } catch (error) {
             res.redirect(error);
