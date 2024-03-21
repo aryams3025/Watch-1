@@ -299,47 +299,47 @@ module.exports = {
             console.log(error);
         }
     },
-    // getreturnOrder : async(req,res) =>{
-    //     const orderId=req.params.id
-    // console.log(orderId)
-    // res.render('shop/return',{orderId:orderId})
-    // },
+    getreturnOrder : async(req,res) =>{
+        const orderId=req.params.id
+    console.log(orderId)
+    res.render('shop/return',{orderId:orderId})
+    },
 
-    // returnOrder:async(req,res)=>{
-    //     const orderId=req.query.orderId
-    //     const {user}=req.session
-    //     const reason=req.body.returnReason
-    //     const message=req.body.message
-    //     const order=await orderSchema.findOne({_id:orderId})
-    //     if(reason === 'Other'){
-    //         for(let products of order.products){
-    //             await productSchema.updateOne({_id:products.productId},{
-    //                 $inc:{
-    //                     quantity: products.quantity
-    //                 }
-    //             })
-    //         }
-    //     }
-    //     await orderSchema.updateOne({_id:orderId},{
-    //         $set:{
-    //             orderStatus:'Returned',ReturnReason:message
-    //         }
-    //     })
-    //     await userSchema.updateOne({_id:user},{
-    //         $inc:{
-    //             wallet:order.totalPrice
-    //         },
-    //         $push:{
-    //             walletHistory:{
-    //                 date:new Date(),
-    //                 amount:order.totalPrice,
-    //                 message:"Deposit on return"
-    //             }
-    //         }
-    //     },)
-    //     res.redirect('/user/orders')
+    returnOrder:async(req,res)=>{
+        const orderId=req.query.orderId
+        const {user}=req.session
+        const reason=req.body.returnReason
+        const message=req.body.message
+        const order=await orderSchema.findOne({_id:orderId})
+        if(reason === 'Other'){
+            for(let products of order.products){
+                await productSchema.updateOne({_id:products.productId},{
+                    $inc:{
+                        quantity: products.quantity
+                    }
+                })
+            }
+        }
+        await orderSchema.updateOne({_id:orderId},{
+            $set:{
+                orderStatus:'Returned',ReturnReason:message
+            }
+        })
+        await userSchema.updateOne({_id:user},{
+            $inc:{
+                wallet:order.totalPrice
+            },
+            $push:{
+                walletHistory:{
+                    date:new Date(),
+                    amount:order.totalPrice,
+                    message:"Deposit on return"
+                }
+            }
+        },)
+        res.redirect('/user/orders')
         
-    //    }
+       },
 
 
 
