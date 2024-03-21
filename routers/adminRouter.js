@@ -57,7 +57,7 @@ router.get('/delete-image',isAuth.adminAuth,productController.deleteImage)
 
 router.get('/orders',isAuth.adminAuth,orderController.getAdminOrderList)
 router.get('/order-products/:id',isAuth.adminAuth,orderController.orderDetails)
-//router.patch('/change-order-status',isAuth.adminAuth,orderController.changeOrderStatus)
+router.patch('/change-order-status',isAuth.adminAuth,orderController.changeOrderStatus)
 
 
 
