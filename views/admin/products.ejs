@@ -108,6 +108,7 @@
                  
                   <th> Price </th>
                   <th> Discount </th>
+                  <th>Stock Left</th>
                  
                 </tr>
               </thead>
@@ -135,7 +136,7 @@
                       
                         <td> <%= product.price %> </td>
                         <td> <%= product.discount %> </td>
-                        
+                        <td><%= product.quantity %></td> <!-- Display stock left -->
                         <td>
                               <div class="row">
                                   <div><a class="badge badge-outline-primary mr-2" href="/admin/edit-product/<%= product._id %>"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
