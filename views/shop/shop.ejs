@@ -143,17 +143,17 @@
                                                     <% if (rating - i < 0.5) { %>
                                                         <i class="fa fa-star-half-o text-warning"></i>
                                                     <% } else { %>
-                                                        <i class="fa                                fa fa-star text-warning"></i>
+                                                        <i class="fa fa fa-star text-warning"></i>
                                                         <% } %>
                                                     <% } else { %>
                                                         <i class="fa fa-star-o"></i>
                                                     <% } %>
                                                 <% } %>
                                             </div>
-                                            <p class="mb-0">Stock : <%= product.quantity %></p>
-                                            <p class="mb-0"><del>₹ <%= product.price %></del></p>
+                                            <!-- <p class="mb-0">Stock : <= product.quantity %></p> -->
+                                            <!-- <p class="mb-0"><del>₹ <= product.price %></del></p> -->
         
-                                            <h5 class="mb-0">₹ <%= product.price - product.discount %> <span class="badge badge-success"> Save ₹ <%= product.discount %> </span></h5>
+                                            <h5 class="mb-0">₹ <%= product.price %> <span class="badge badge-success"> Save 2% </span></h5>
                                         </div>
                                     </div>
                                 </div>
