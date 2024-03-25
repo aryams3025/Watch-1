@@ -246,7 +246,7 @@ module.exports = {
                             
                             return res.status(200).json({ success: true, message: 'Added to cart', login: true });
                         } else {
-                            // If available quantity is 0, indicate that it's out of stock
+                            // available quantity is 0 indicate that it's out of stock
                             return res.json({ message: "Oops! It seems you've reached the maximum quantity of products available for purchase.", login: true, outOfStock: true });
                         }
                     } else {

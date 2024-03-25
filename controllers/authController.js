@@ -2,7 +2,8 @@ const bcrypt = require('bcrypt')
 const userSchema = require('../model/userModels')
 const adminSchema = require('../model/adminSchema')
 const flash = require('express-flash');
-const verificationController = require('../controllers/verificationController')
+const verificationController = require('../controllers/verificationController');
+const { longFormatters } = require('date-fns');
 
 
 module.exports={
@@ -349,6 +350,13 @@ module.exports={
             res.redirect('/login')
         }catch(error){
             res.redirect('/500')
+        }
+    },
+    adminDashBoard : async(req,res) =>{
+        try{
+            res.render('admin/dashboard')
+        }catch(error){
+            console.log(error);
         }
     }
 }

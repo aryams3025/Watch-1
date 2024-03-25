@@ -31,6 +31,10 @@ router.get('/adminsign',authController.adminsignUp)
 router.post('/adminsign',authController.postadminlogin)
 
 
+//get admin dashboard 
+router.get('/adminDashBoard', isAuth.adminAuth,authController.adminDashBoard)
+
+
 //user profile change password and the setting
 router.get('/change-password',isAuth.userAuth,authController.getuserChangePassword)
 router.post('/change-password',isAuth.userAuth,authController.changeUserPassword)

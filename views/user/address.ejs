@@ -113,6 +113,9 @@
                 </div>
             </div>
             <div class="col-md-9">
+                <div class="row mt-3 pl-lg-5 address p-2">
+                    <a class="btn text-primary fw-bold " href="/user/add-address">Add Address</a>
+                </div>
                 <% if( address && address.length > 0) { %>
                     <% for ( let items of address ){ %>
                         <div id="addressdiv-<%= items._id %>" class="row pl-lg-5 address mb-4">
@@ -132,9 +135,7 @@
                         </div>
                     <% } %>
                 <% } %>
-                <div class="row mt-3 pl-lg-5 address p-2">
-                    <a class="btn text-primary fw-bold " href="/user/add-address">Add Address</a>
-                </div>
+                
             </div>
         </div>
         <!--/.row-->

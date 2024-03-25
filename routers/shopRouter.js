@@ -4,7 +4,7 @@ const shopController = require('../controllers/shopController');
 const isAuth = require('../middleware/isAuth');
 const isBlocked = require('../middleware/isBlocked')
 const cartController = require('../controllers/cartController')
-
+const wishlistController = require('../controllers/wishlistController')
 
 const orderController = require('../controllers/orderController')
 // router.get('/', shopController.getHome);
@@ -27,6 +27,7 @@ router.post('/add-checkout-address',isAuth.userAuth,isBlocked.isBlocked,shopCont
 router.post('/place-order',isAuth.userAuth,isBlocked.isBlocked,orderController.placeOrder)
 router.get('/confirm-order',isAuth.userAuth,isBlocked.isBlocked,orderController.getConfirmOrder)
 
-
-
+router.get('/add-to-wishlist',isAuth.userAuth,wishlistController.addToWishList)
+router.get('/wishlist',isAuth.userAuth,wishlistController.getWishList)
+router.put( '/remove-wishlist-item', isAuth.userAuth, wishlistController.removeItem )
 module.exports = router;
