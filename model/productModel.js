@@ -29,6 +29,10 @@ const productSchema = Schema({
         type: Number,
         required: true
     },
+    createdAt:{
+        type:Date,
+        default:Date.now
+    },
     discount: {
         type: Number,
         required: true

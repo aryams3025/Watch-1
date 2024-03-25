@@ -131,8 +131,19 @@ module.exports = {
                 .sort(sortCondition) // Apply sorting
                 .skip((page - 1) * paginationHelper.ITEMS_PER_PAGE)
                 .limit(paginationHelper.ITEMS_PER_PAGE);
+                const newproducts = await productSchema.find()
+                .populate({
+                    path: "category",
+                    match: { status: true }
+                })
+                .populate({
+                    path: "brand",
+                    match: { status: true }
+                })
+                .sort({createdAt:-1}).limit(3)
     
-            const filteredProducts = products.filter(product => product.category && product.brand);  // Pagination
+            const filteredProducts = products.filter(product => product.category && product.brand);
+            const newfilteredProducts = newproducts.filter(product => product.category && product.brand);  // Pagination
             const category = await categorySchema.find({ status: true });
             const brands = await brandSchema.find({ status: true });
             const startingNo = ((page - 1) * paginationHelper.ITEMS_PER_PAGE) + 1;
@@ -140,6 +151,7 @@ module.exports = {
             res.render('shop/shop', {
                 userLoggedin: userLoggedin,
                 products: filteredProducts,
+                newproducts:newfilteredProducts,
                 category: category,
                 brands: brands,
                 totalCount: productCount,

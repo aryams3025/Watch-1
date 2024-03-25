@@ -1,0 +1,163 @@
+<%- include('../includes/userHead.ejs') %>
+<%- include('../includes/userNavbar.ejs') %>
+
+<style>
+    .shop-now a:hover {
+        color: #111;
+    }
+</style>
+<section class="shopping-cart spad mt-5">
+    <div class="container">
+        <% if (list && list.length > 0) { %>
+        <div class="row" id="cart-table">
+            <div class="col-12">
+                <div class="shopping__cart__table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (let product of list[0].products) { %>
+
+                            <tr id="wishlist-row-<%= product._id %>">
+                                <td class="product__cart__item">
+                                    <div class="product__cart__item__pic">
+                                        <img src="/images/product-images/<%= product.image[0] %>" width="100" alt="">
+                                    </div>
+                                    <div class="product__cart__item__text">
+                                        <h6><%= product.name %></h6>
+                                        <h5 id="price-<%= product._id %>"> <% if ( product.offer && !product.category.offer){ var discount = (product.price * product.offer.percentage / 100).toFixed(0)  } else if ( product.category.offer && !product.offer ) {var discount = ( product.price * product.category.offer.percentage / 100 ).toFixed(0) }else if ( product.category.offer && product.offer ){
+                                            if(product.offer.percentage<product.category.offer.percentage){
+                                             {var discount = ( product.price * product.category.offer.percentage / 100 ).toFixed(0) }}
+                                            else{
+                                                var discount = (product.price * product.offer.percentage / 100).toFixed(0)
+                                            }} %>
+                                        <% if ( product.offer && !product.category.offer) { %>
+                                            <p class="mb-0"><del>₹ <%= product.price %></del></p>
+                                            <h5 class="mb-0">₹ <%= product.price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                                        <%} else if ( product.category.offer && !product.offer ) { %>
+                                            <p class="mb-0"><del>₹ <%= product.price %></del></p>
+                                            <h5 class="mb-0 fw-700">₹ <%= product.price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                                        <%} else if ( product.category.offer && product.offer ) { %>
+                                            <p class="mb-0"><del>₹ <%= product.price %></del></p>
+                                            <h5 class="mb-0 fw-700">₹ <%= product.price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                                            <% } else { %>
+                                            <h5>₹ <%= product.price %> </h5>
+                                        <% } %></h5>
+                                    </div>
+                                </td>
+
+                                <td class="cart__close"><button onclick="addToCart('<%= product._id %>')" style="cursor: pointer;" class="btn btn-dark rounder-0">Add to cart</button></i></td>
+                                <td class="cart__close"><i onclick="removeItem('<%= product._id %>')" style="cursor: pointer;" class="fa fa-close"></i></td>
+                            </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="continue__btn">
+                            <a href="/shop">Continue Shopping</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <% } else { %>
+        <div class="col-12 mt-5">
+            <h1 class="text-center"><b>Wishlist is empty...</b></h1>
+            <br>
+            <h3 class="text-center shop-now"><a href="/shop">Shop now</a></h3>
+        </div>
+        <% } %>
+    </div>
+</section>
+
+<!-- Include SweetAlert CDN -->
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+    
+    async function addToCart(productId) {
+        try {
+            const response = await axios.post('/add-to-cart', { productId });
+
+            if (response.data.outOfStock) {
+                // Show error message with SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: "It seems you've reached the maximum quantity of products available for purchase.",
+                });
+            }
+
+            if (response.data.newItem === true) {
+                // Show success message with SweetAlert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Product added to cart.',
+                });
+
+                // Update the cart count
+                const count = document.getElementById('cartCount');
+                count.innerHTML = parseInt(count.innerHTML) + 1;
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
+    async function removeItem(productId) {
+    Swal.fire({
+        title: 'Remove Item',
+        text: 'Are you sure you want to remove this item from your wishlist?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, remove it!'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await axios.put('/remove-wishlist-item', { productId });
+
+                if (response.data.success) {
+                    // Remove the wishlist item row
+                    const wrow = document.getElementById(`wishlist-row-${productId}`);
+                    wrow.style.display = 'none';
+                    Swal.fire({
+                    title: 'Removed',
+                    text: 'The item has been removed from your wishlist.',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+                }
+
+               
+            } catch (error) {
+                console.error(error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred while removing the item. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        }
+    });
+}
+
+</script>
+
+<%- include('../includes/userFooter.ejs') %>
+<%- include('../includes/end.ejs') %>

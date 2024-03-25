@@ -23,31 +23,64 @@ module.exports = {
     },
     
 
-    addAddress : async(req,res) =>{
-        try{
-            const address = await addressSchema({
-                fullName : req.body.fullName,
-                mobile : req.body.mobile,
-                landmark : req.body.landmark,
-                street : req.body.street,
-                village : req.body.village,
-                city : req.body.city,
-                pincode : req.body.pincode,
-                state : req.body.state,
-                country : req.body.country,
-                userId : req.session.user
-            })
+    // addAddress : async(req,res) =>{
+    //     try{
+            
 
-            const result = await address.save()
-            await userSchema.updateOne({_id:req.session.user},{$push : {address : result._id}})
-            res.redirect('user/address')
-        }catch(error){
-            console.log(error);
-        }
-    },
-    getaddAddress : async(req,res)=>{
+    //         const address = new addressSchema({
+    //             fullName : req.body.fullName,
+    //             mobile : req.body.mobile,
+    //             landmark : req.body.landmark,
+    //             street : req.body.street,
+    //             village : req.body.village,
+    //             city : req.body.city,
+    //             pincode : req.body.pincode,
+    //             state : req.body.state,
+    //             country : req.body.country,
+    //             userId : req.session.user
+    //         })
+
+    //         const result = await address.save()
+    //         await userSchema.updateOne({_id:req.session.user},{$push : {address : result._id}})
+    //         res.redirect('user/address')
+    //     }catch(error){
+    //         console.log(error);
+    //     }
+    // },
+    // getaddAddress : async(req,res)=>{
+    //     res.render('user/add-address')
+    // },
+
+    getAddAddress:(req,res)=>{
         res.render('user/add-address')
     },
+    //Adding address
+    addAddress:async(req,res)=>{
+        try{
+            const address=new addressSchema({
+                fullName:req.body.fullName,
+                mobile:req.body.mobile,
+                landmark:req.body.landmark,
+                street:req.body.street,
+                village:req.body.village,
+                city:req.body.city,
+                pincode:req.body.pincode,
+                state:req.body.state,
+                country:req.body.country,
+                userId:req.session.user
+            })
+            const result=await address.save()
+            await userSchema.updateOne({_id:req.session.user},{
+                $push:{address:result._id}
+            })
+            res.redirect('/user/address')
+        }catch(error){
+            res.redirect('/500')
+        }
+    },
+
+
+
     getAddress:async(req,res)=>{
         try{
             const user=await userSchema.find({_id:req.session.user}).populate({
@@ -63,34 +96,66 @@ module.exports = {
         }catch(error){
             res.redirect('/500')
         }
-    },getEditAddress:async(req,res)=>{
-        try{
-            const addressId=req.params.id
-            const address=await addressSchema.findOne({_id:addressId})
-            res.render('user/edit-address',{address:address})
-        }catch(error){
-            res.redirect('/500')
+    },
+    //getEditAddress:async(req,res)=>{
+    //     try{
+    //         const addressId=req.params.id
+    //         const address=await addressSchema.findOne({_id:addressId})
+    //         res.render('user/edit-address',{address:address})
+    //     }catch(error){
+    //         res.redirect('/500')
+    //     }
+    // },
+    // editAddress : async(req,res)=>{
+    //     const addressId=req.body.id
+    //     try{
+    //         await addressSchema.updateOne({_id:addressId},{
+    //             $set:{
+    //                 fullName:req.body.fullName,
+    //                 mobile:req.body.mobile,
+    //                 landmark:req.body.landmark,
+    //                 street:req.body.street,
+    //                 village:req.body.village,
+    //                 city:req.body.city,
+    //                 pincode:req.body.pincode,
+    //                 state:req.body.state,
+    //                 country:req.body.country   
+    //             }
+    //         })
+    //         res.redirect('/user/address')
+    //     }catch(error){
+    //         res.redirect('/500')
+    //     }
+    // },
+
+    getEditAddress: async (req, res) => {
+        try {
+            const addressId = req.params.id;
+            const address = await addressSchema.findOne({ _id: addressId });
+            res.render('user/edit-address', { address: address });
+        } catch (error) {
+            res.redirect('/500');
         }
     },
-    editAddress : async(req,res)=>{
-        const addressId=req.body.id
-        try{
-            await addressSchema.updateOne({_id:addressId},{
-                $set:{
-                    fullName:req.body.fullName,
-                    mobile:req.body.mobile,
-                    landmark:req.body.landmark,
-                    street:req.body.street,
-                    village:req.body.village,
-                    city:req.body.city,
-                    pincode:req.body.pincode,
-                    state:req.body.state,
-                    country:req.body.country   
+    editAddress: async (req, res) => {
+        const addressId = req.body.id;
+        try {
+            await addressSchema.updateOne({ _id: addressId }, {
+                $set: {
+                    fullName: req.body.fullName,
+                    mobile: req.body.mobile,
+                    landmark: req.body.landmark,
+                    street: req.body.street,
+                    village: req.body.village,
+                    city: req.body.city,
+                    pincode: req.body.pincode,
+                    state: req.body.state,
+                    country: req.body.country
                 }
-            })
-            res.redirect('/user/address')
-        }catch(error){
-            res.redirect('/500')
+            });
+            res.redirect('/user/address');
+        } catch (error) {
+            res.redirect('/500');
         }
     },
 

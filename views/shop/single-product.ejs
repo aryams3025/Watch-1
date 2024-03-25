@@ -128,10 +128,11 @@
                        
                         <p><%= product[0].description %></p>
                         <div class="product__details__cart__option">
-                            <a style="cursor: pointer;" onclick="addToCart('<%= product[0]._id %>')" class="primary-btn text-white">add to cart</a>
+                            
+                            <a  href='/cart' style="cursor: pointer;" onclick="addToCart('<%= product[0]._id %>')" class="primary-btn text-white">add to cart</a>
                         </div>
                         <div class="product__details__btns__option">
-                            <a style="cursor: pointer;" onclick="addtoWishlist('<%= product[0]._id %>')"><i class="fa fa-heart"></i> add to wishlist</a>
+                            <a href="/add-to-wishlist" style="cursor: pointer;" onclick="addtoWishlist('<%= product[0]._id %>')"><i class="fa fa-heart"></i> add to wishlist</a>
                         </div>
                         <div class="product__details__last__option">
                             <h5><span>Guaranteed Safe Checkout</span></h5>
@@ -362,6 +363,7 @@ zIndex: 999
         }
     }
 
+   
     async function addtoWishlist(productId) {
             try {
                 const response = await axios.post('/add-to-wishlist', { productId });
@@ -388,6 +390,7 @@ zIndex: 999
                 });
             }
         }
+
 
 </script>
 

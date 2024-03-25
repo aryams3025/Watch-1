@@ -10,7 +10,7 @@ router.get('/profile',isAuth.userAuth,userController.getUserProfile)
 router.put('/edit-profile',isAuth.userAuth,userController.editProfile)
 
 router.get('/address',isAuth.userAuth,userController.userAddress)
-router.get('/add-address',isAuth.userAuth,userController.getaddAddress)
+router.get('/add-address',isAuth.userAuth,userController.getAddAddress)
 router.post('/add-address',isAuth.userAuth,userController.addAddress)
 router.get('/address',isAuth.userAuth,userController.getAddress)
 

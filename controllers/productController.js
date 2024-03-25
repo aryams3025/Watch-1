@@ -94,7 +94,7 @@ module.exports = {
                 .sort(sort)
                 .skip((page - 1) * paginationHelper.PRODUCT_PER_PAGE)
                 .limit(paginationHelper.PRODUCT_PER_PAGE);
-
+                
                 res.render('admin/products', {
                 admin: req.session.admin,
                 // products: products,
@@ -212,6 +212,10 @@ module.exports = {
     posteditProduct: async (req, res) => {
         try {
             const existingProduct = await productSchema.findById(req.body.productId);
+            if (req.body.price < 0) {
+                req.flash('err', 'Price should not be negative');
+                return res.redirect(`/admin/edit-product/${existingProduct._id}`);
+            }
             if (req.files) {
                 for (let file of req.files) {
                     if (
