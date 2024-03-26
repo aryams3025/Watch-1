@@ -112,9 +112,9 @@
                         
                         </button>
                     </form>
-                    <!-- <div class="row mt-3">
+                    <div class="row mt-3">
                         <a style="box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px; padding: 15px 30px;" class="text-primary fw-700">
-                             <b>Wallet Balance : ₹ <if( user.wallet) {><= user.wallet %><} else { %>0<} %> </b>
+                             <b>Wallet Balance : ₹ <%= user.wallet ? user.wallet : 0 %> </b>
                         </a>
                     </div>
                     <div class="row mt-3">
@@ -124,9 +124,10 @@
                     </div>
                     <div class="row mt-3">
                         <a style="box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px; padding: 15px 30px;" class="text-primary fw-700">
-                             <b>Referal:<= user.referralCode %> </b>
+                             <b>Referal: <%= user.referralCode %> </b>
                         </a>
-                    </div> -->
+                    </div>
+                    
                     
                 </div>
                 

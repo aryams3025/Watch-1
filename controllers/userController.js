@@ -185,5 +185,18 @@ module.exports = {
     },
 
     
+    getwalletHistory:async(req,res)=>{
+        try{
+            const {user}=req.session
+            const userDetails=await userSchema.findOne({_id:user})
+            if (userDetails) {
+                // Sort walletHistory based on the date field in descending order (latest first)
+                userDetails.walletHistory.sort((a, b) => b.date - a.date);
+              }
+            res.render('user/wallet',{user:userDetails})
 
+        }catch(error){
+            res.redirect('/500')
+        }
+    }
 }

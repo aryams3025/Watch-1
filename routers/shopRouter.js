@@ -27,7 +27,12 @@ router.post('/add-checkout-address',isAuth.userAuth,isBlocked.isBlocked,shopCont
 router.post('/place-order',isAuth.userAuth,isBlocked.isBlocked,orderController.placeOrder)
 router.get('/confirm-order',isAuth.userAuth,isBlocked.isBlocked,orderController.getConfirmOrder)
 
-router.get('/add-to-wishlist',isAuth.userAuth,wishlistController.addToWishList)
-router.get('/wishlist',isAuth.userAuth,wishlistController.getWishList)
+
+
+
+router.post('/add-to-wishlist',isAuth.userAuth,wishlistController.addToWishlist)
+router.get ( '/wishlist', isAuth.userAuth, wishlistController.getWishlist )
 router.put( '/remove-wishlist-item', isAuth.userAuth, wishlistController.removeItem )
+
+
 module.exports = router;

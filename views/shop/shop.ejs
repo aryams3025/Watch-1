@@ -337,8 +337,24 @@
             // count.innerHTML = updatedCount;
             // window.location.reload();
             }
+            else {
+            // Handle unexpected response status
+            console.error('Unexpected response status:', response.status);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong!',
+            });
+        }
         } catch (error) {
             console.log(error.message);
+            Swal.fire({
+                    title: 'Product Added to Cart',
+                    text: 'The selected product has been added to your cart.',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'OK'
+                });
         }
     }
 

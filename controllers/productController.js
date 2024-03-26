@@ -5,7 +5,8 @@ const paginationHelper = require('../helpers/paginationHelper');
 const categorySchema = require('../model/categoryModel');
 const { error } = require('console');
 const brandSchema = require('../model/brandModel');
-const orderSchema = require('../model/orderModel')
+const orderSchema = require('../model/orderModel');
+const offerSchema = require('../model/offerModel')
 module.exports = {
     getAddProducts: async (req, res) => {
         try {
@@ -82,7 +83,7 @@ module.exports = {
                     { description: { $regex: search, $options: 'i' } },
                 ];
             }
-
+            const availabileOffers = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }})
             const productsCount = await productSchema.find(condition).count();
             const productCount = await productSchema.find(condition).countDocuments();
             //const products = await productSchema.find(condition)
@@ -110,6 +111,7 @@ module.exports = {
                 search: search,
                 sortData: sortData,
                 sortOrder: sortOrder,
+                availabileOffers  : availabileOffers
             });
         } catch (error) {
             console.log(error);

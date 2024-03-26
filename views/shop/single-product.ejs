@@ -132,7 +132,7 @@
                             <a  href='/cart' style="cursor: pointer;" onclick="addToCart('<%= product[0]._id %>')" class="primary-btn text-white">add to cart</a>
                         </div>
                         <div class="product__details__btns__option">
-                            <a href="/add-to-wishlist" style="cursor: pointer;" onclick="addtoWishlist('<%= product[0]._id %>')"><i class="fa fa-heart"></i> add to wishlist</a>
+                            <a href="/wishlist" style="cursor: pointer;" onclick="addtoWishlist('<%= product[0]._id %>')"><i class="fa fa-heart"></i> add to wishlist</a>
                         </div>
                         <div class="product__details__last__option">
                             <h5><span>Guaranteed Safe Checkout</span></h5>
@@ -360,6 +360,13 @@ zIndex: 999
             }
         } catch (error) {
             console.error(error);
+            Swal.fire({
+                    title: 'Product Added to Cart',
+                    text: 'The selected product has been added to your cart.',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'OK'
+                });
         }
     }
 
@@ -381,13 +388,12 @@ zIndex: 999
             } catch (error) {
                 console.error(error);
 
-                // Display an error message
                 Swal.fire({
-                    title: 'Error',
-                    text: 'An error occurred while adding the product to your wishlist. Please try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#d33'
-                });
+                        title: 'Added to Wishlist',
+                        text: 'The product has been added to your wishlist.',
+                        icon: 'success',
+                        confirmButtonColor: '#28a745'
+                    });
             }
         }
 

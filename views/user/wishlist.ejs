@@ -49,7 +49,7 @@
                                     </div>
                                 </td>
 
-                                <td class="cart__close"><button onclick="addToCart('<%= product._id %>')" style="cursor: pointer;" class="btn btn-dark rounder-0">Add to cart</button></i></td>
+                                <td class="cart__close"><a href="/cart"><button onclick="addToCart('<%= product._id %>')" style="cursor: pointer;" class="btn btn-dark rounder-0">Add to cart</button></a></i></td>
                                 <td class="cart__close"><i onclick="removeItem('<%= product._id %>')" style="cursor: pointer;" class="fa fa-close"></i></td>
                             </tr>
                             <% } %>
