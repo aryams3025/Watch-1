@@ -3,6 +3,8 @@ const paginationHelper=require('../helpers/paginationHelper')
 
 const categorySchema = require('../model/categoryModel')
 
+const offerSchema = require('../model/offerModel')
+
 const flash = require('express-flash')
 
 
@@ -34,7 +36,8 @@ if (sortData) {
 }
 
 //  sort object in  query
-const categoryCount = await categorySchema.find(condition).sort(sort).count();
+            const availabileOffers = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }})
+            const categoryCount = await categorySchema.find(condition).sort(sort).count();
 
 
               const category = await categorySchema.find( condition ).populate('offer')
@@ -53,7 +56,7 @@ const categoryCount = await categorySchema.find(condition).sort(sort).count();
                 search : search,
                 sortData : sortData,
                 sortOrder : sortOrder,
-                
+                availabileOffers : availabileOffers
 
             } )
         

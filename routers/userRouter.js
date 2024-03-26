@@ -25,5 +25,7 @@ router.patch('/cancel-order',isAuth.userAuth,isBlocked.isBlocked,orderController
 router.get('/getReturn/:id',isAuth.userAuth,isBlocked.isBlocked,orderController.getreturnOrder)
 
 
+router.get('/wallet',isAuth.userAuth,isBlocked.isBlocked,userController.getwalletHistory)
+
 router.post( '/return-order', isAuth.userAuth,isBlocked.isBlocked, orderController.returnOrder )
 module.exports = router;
