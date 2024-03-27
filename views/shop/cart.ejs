@@ -127,18 +127,37 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="cart__discount">
-                        
+                        <h6>Discount Coupons</h6>
+                      
+                            
+                                <form id="coupon-form">
+                                    <input id="coupon-input" type="text" placeholder="Coupon code">
+                                    <% if (discounted) { %>
+                                        <button onclick="cancelCoupon(event)" id="cancel">Cancel</button>
+                                    <% }else{ %>
+                                    <button onclick="applyCoupon(event)">Apply</button>
+                                    <% } %>
+                                </form>
+                                <div id="coupon-message" class="coupon-message"></div>
+                        </div>
+                    <div class="container">
+                        <a href=""></a><button type="button" class="btn btn-danger rounded-0 badge-dar mb-2" data-toggle="modal" data-target="#discountModal">
+                          Show Available coupons
+                        </button>  
+                      </div>
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
                             <li>Subtotal <span id="subtotal">₹ <%= totalAmount[0].total %></span></li>
-                            
+                            <li>Coupon discount <span id="coupon-discount"><% if( discounted ) { %>- ₹ <%= discounted.discountAmount %> <% } else { %>₹ 0<% } %></span></li>
+                            <li>Total <span id="total"><% if( discounted ) { %>₹ <%= discounted.discountedTotal %><% } else { %>₹ <%= totalAmount[0].total %><% } %></span></li>
                         </ul>
                         
                             <a href="/checkout" class="primary-btn">Proceed to checkout</a>
                        
                         
                     </div>
+                </div>
                 </div>
             </div>
         <% } else { %>
