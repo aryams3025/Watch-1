@@ -5,8 +5,10 @@ const isAuth = require('../middleware/isAuth');
 const isBlocked = require('../middleware/isBlocked')
 const cartController = require('../controllers/cartController')
 const wishlistController = require('../controllers/wishlistController')
-
+const couponController = require('../controllers/couponController')
 const orderController = require('../controllers/orderController')
+
+
 // router.get('/', shopController.getHome);
 router.get('/shop',shopController.getShop);
 router.get('/products/:id',shopController.getSingleProduct)
@@ -33,6 +35,11 @@ router.get('/confirm-order',isAuth.userAuth,isBlocked.isBlocked,orderController.
 router.post('/add-to-wishlist',isAuth.userAuth,wishlistController.addToWishlist)
 router.get ( '/wishlist', isAuth.userAuth, wishlistController.getWishlist )
 router.put( '/remove-wishlist-item', isAuth.userAuth, wishlistController.removeItem )
+
+
+router.post('/apply-coupon',isAuth.userAuth,couponController.applyCoupon)
+router.get('/cancelCoupon',isAuth.userAuth,couponController.cancelCouponuser)
+
 
 
 module.exports = router;
