@@ -37,7 +37,7 @@ router.get ( '/wishlist', isAuth.userAuth, wishlistController.getWishlist )
 router.put( '/remove-wishlist-item', isAuth.userAuth, wishlistController.removeItem )
 
 
-router.post('/apply-coupon',isAuth.userAuth,couponController.applyCoupon)
+router.post('/apply-coupon',isAuth.userAuth,couponController.applyCoupn)
 router.get('/cancelCoupon',isAuth.userAuth,couponController.cancelCouponuser)
 
 
