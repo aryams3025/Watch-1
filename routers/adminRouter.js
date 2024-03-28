@@ -69,6 +69,9 @@ router.post('/edit-coupon', isAuth.adminAuth, couponController.editCoupon);
 router.patch('/cancel-coupon', isAuth.adminAuth, couponController.cancelCoupon);
 router.patch('/reactivate-coupon', isAuth.adminAuth, couponController.reactivateCoupon);
 
+
+router.get('/coupons',isAuth.userAuth,couponController.getCoupons)
+
 //offer management 
 
 

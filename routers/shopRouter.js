@@ -39,7 +39,7 @@ router.put( '/remove-wishlist-item', isAuth.userAuth, wishlistController.removeI
 
 router.post('/apply-coupon',isAuth.userAuth,couponController.applyCoupn)
 router.get('/cancelCoupon',isAuth.userAuth,couponController.cancelCouponuser)
-
+//router.get('/availabile-coupons',isAuth.userAuth,couponController.getAvailabileCoupons)
 
 
 module.exports = router;

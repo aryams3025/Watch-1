@@ -49,8 +49,8 @@ module.exports={
                 discounted = await couponHelper.discountPrice( updatedCart.coupon, totalPrice[0].total )
             }
             
-            const availableCoupons = await couponSchema.find({ status : true , startingDate : { $lte : new Date() }, expiryDate : { $gte : new Date() } })
-            console.log(updatedCart)
+            const availableCoupons = await couponSchema.find({status:true,startingDate:{$lte:new Date()},expiryDate:{$gte:new Date()}})
+
             
 
             res.render( 'shop/cart', {
