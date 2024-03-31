@@ -1,0 +1,325 @@
+
+<%- include('../includes/admin/adminHead.ejs') %>
+<%- include('../includes/admin/adminNavbar.ejs') %>
+<style>
+    .dropdown-menu a:hover{
+        color: white!important;
+        cursor: pointer;
+    }
+    .pagination-btn{
+    padding: 50px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    }
+    .pagination-btn a{
+        text-decoration: none;
+        color: #ececec;
+    }
+    .pagination-btn a :hover{
+        color: #111;
+    }
+    .pagination-btn button:hover{
+        color: #111;
+    }
+    .pagination-btn button:active{
+        background-color: #fff;
+        color: #111!important;
+    }
+    .header {
+    background-color: rgb(9, 81, 106);
+    color: white;
+}
+
+.summary {
+    font-weight: bold;
+}
+
+    
+</style>
+
+<div class="main-panel">
+    <div class="content-wrapper">
+      <% if ( seeAll ) { %>
+        <div><a class="badge badge-outline-primary" href="/admin/sales-report">Show less</a></div>
+        <% } else { %>
+          <div><a class="badge badge-outline-primary" href="/admin/sales-report?seeAll=seeAll">Show all</a></div>
+      <% } %>
+
+<div class="row mt-5">
+    <div class="col-12 grid-margin">
+      <div class=" row   mt-3">
+
+        <div class="col-12 col-sm-6">
+          <div class="row m-0">
+            <div class="col-md-6">
+              <div class="form-group row">
+                <div class="col-sm-12">
+                  <form action="/admin/sales-report">
+                  <select class="form-control" name="sortData">
+                    <option value="date" >Date</option>
+                    <option value="totalPrice" >Amount</option>
+                    <option value="totalPrice">Weekly</option>
+                    <option value="totalPrice">Monthly</option>
+                    <option value="totalPrice">Yearly</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-group row">
+                <div class="col-sm-12">
+                  <select class="form-control" name="sortOrder">
+                    <option>Ascending</option>
+                    <option>Descending</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="sort form-group col-md-4 mb-3"><button class=" btn btn-primary form-control">
+              sort
+            </button></div>
+          </form>
+          </div>
+        </div>
+
+        </div>
+
+        <div class="row">
+        <form class="col-12" action="/admin/sales-report<% if(seeAll){ %>?seeAll=seeAll<% } %>" id="sales-report-form">
+          <div class="col-12 col-sm-6">
+
+            <label for="birthday">From :</label>
+            <input style="background-color: #dcdcdc; border-radius: 5px; border: none; padding: 0px 10px;" value="<%= from %>" type="date" id="from" name="from">
+          </div>
+          <div class="col-12 col-sm-6">
+
+            <label class="" for="birthday">To :</label>
+            <input style="background-color: #dcdcdc; border-radius: 5px; border: none; padding: 0px 10px;" value="<%= to %>" type="date" id="to" name="to">
+          </div>
+            <button class="btn btn-primary ml-3 mb-3" type="submit">filter</button>
+        </form>
+        <div class="ml-3">
+
+          <button type="button" onclick="excelDownload()" id="excel-export" class="btn btn-success btn-icon-text ml-auto mb-1"> Excel <i class="mdi mdi-printer btn-icon-append"></i>
+            <button type="button" onclick="printDiv('Print')" class="btn btn-info btn-icon-text ml-1 mr-auto mb-1"> Print <i class="mdi mdi-printer btn-icon-append"></i>
+            </button>
+        </div>
+    </div>
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Recent sales</h4>
+          <div class="table-responsive" id="Print">
+            <div class="container">
+              <table class="table" id="sales-table">
+                  <thead>
+                      <tr>
+                          <th class="header">Date</th>
+                          <th class="header">OrderId</th>
+                          <th class="header">Payment</th>
+                          <th class="header">Amount</th>
+                          <th class="header">Order Status</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <% for (let order of orders) { %>
+                          <tr>
+                              <td><%= moment(order.date).format(shortDateFormat) %></td>
+                              <td><%= order._id %></td>
+                              <td><%= order.paymentMethod %></td>
+                              <td><%= order.totalPrice %></td>
+                              <td id="order-status-<%= order._id %>">
+                                  <% if (order.orderStatus) { %>
+                                      <%= order.orderStatus %>
+                                  <% } else { %>
+                                      Pending
+                                  <% } %>
+                              </td>
+                          </tr>
+                      <% } %>
+                  </tbody>
+              </table>
+          </div>
+          <br><br>
+          <div class="container">
+              <div class="row">
+                  <div class="col">
+                      <p class="summary">Overall sales count   : <%= overallSalesCount %></p>
+                  </div>
+                  <div class="col">
+                      <p class="summary">Overall order amount  : <%= overallOrderAmount %></p>
+                  </div>
+                  <div class="col">
+                      <p class="summary">Overall discount      : <%= overallDiscount %></p>
+                  </div>
+              </div>
+          </div>
+          
+            
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination buttons -->
+      <% if( !seeAll ) { %>
+
+        <div class="pagination-btn">
+          <% if( currentPage !== 1 ) { %> 
+          <a href="/admin/sales-report?page=1<% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 1">1</button></a>
+        <% } %>
+        <% if( currentPage > 2 ) { %>
+            <a href="/admin/sales-report?page=<%= prevPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 2"><%= prevPage %></button></a> 
+        <% } %>
+        <a href="/admin/sales-report?page=<%= currentPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 3 active"><%= currentPage %></button></a>
+        <% if( hasNextPage ) { %>
+            <a href="/admin/sales-report?page=<%= nextPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 4"><%= nextPage %></button></a> 
+        <% } %>    
+        <% if( nextPage !== lastPage && currentPage !== lastPage ) { %>
+            <a href="/admin/sales-report?page=<%= lastPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 5"><%= lastPage %></button></a>
+        <% } %>
+    </div>
+    <% } %>
+
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+</div>
+
+<!-- The popup message modal -->
+<div id="popupModal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content bg-light text-dark">
+      <div class="modal-body">
+      <h5 id="modalHead" class="modal-title"></h5><br>
+      <p id="modalContent"></p>
+      </div>
+  </div>
+  </div>
+</div>
+
+
+<script>
+
+
+function excelDownload() {
+    // Get the table data
+    var table = document.getElementById("sales-table");
+    var wb = XLSX.utils.table_to_book(table, { sheet: "SheetJS" });
+
+    // Convert the workbook to an array buffer
+    var wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+
+    // Create a Blob object to store the workbook data
+    var blob = new Blob([wbout], { type: "application/octet-stream" });
+
+    // Generate a temporary anchor element and trigger the download
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    var url = window.URL.createObjectURL(blob);
+    var today = formatDateToString( new Date() )
+    a.href = url;
+    a.download = "MF-"+today+".xlsx";
+    a.click();
+
+    // Cleanup
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+
+ 
+
+  const dateForm = document.getElementById('sales-report-form')
+  
+  
+  dateForm.addEventListener( 'submit' , function(event){
+    const now = new Date()
+    // const fromDate = document.getElementById( 'from' )
+    const from = document.getElementById( 'from' ).value
+    const to = document.getElementById( 'to' ).value
+    const fromDate = new Date( from )
+    const toDate = new Date( to )
+    if( fromDate > now ){
+      showModal('Warning', 'From date cannot be greater than Today')
+      event.preventDefault()
+    }
+    if( toDate > now) {
+      showModal('Warning', 'To date cannot be greater than Today')
+      event.preventDefault()
+    }
+    if( fromDate > toDate ) {
+      showModal('Warning', 'From date cannot be greater than To date')
+      event.preventDefault()
+    }
+  })
+  
+
+    function printDiv( divName ) {
+        const printContents = document.getElementById( divName ).innerHTML
+        const originalContents = document.body.innerHTML
+        document.body.innerHTML = printContents;
+        window.print()
+        document.body.innerHTML = originalContents
+        return
+    }
+
+    function showModal(title,message) {
+
+    const modalTitle = document.getElementById('modalHead')
+    const modalBody = document.getElementById('modalContent')
+
+    modalTitle.innerText = title;
+    modalBody.innerText = message;
+
+
+    // Show the popup message modal
+    $('#popupModal').modal('show');
+
+    // Hide the popup message modal when clicking outside of it
+    $(document).on('click', function(event) {
+    if (!$(event.target).closest('.modal-content').length) {
+      $('#popupModal').modal('hide');
+    }
+    });
+
+    }
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+
+<script>
+  function formatDateToString(date) {
+  // Ensure we have a valid date object
+  if (!(date instanceof Date) || isNaN(date)) {
+    return "Invalid Date";
+  }
+
+  // Get the day, month, and year components from the date
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear());
+
+  // Concatenate the components with hyphens and return the formatted string
+  return `${day}-${month}-${year}`;
+}
+
+// Example usage:
+const date = new Date(); // Replace this with your date object
+const formattedDate = formatDateToString(date);
+
+
+
+
+</script>
+
+
+
+
+<%- include('../includes/admin/adminFooter.ejs') %>

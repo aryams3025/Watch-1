@@ -60,7 +60,6 @@ router.patch('/change-order-status',isAuth.adminAuth,orderController.changeOrder
 
 // coupon management
 
-
 router.get('/coupons', isAuth.adminAuth, couponController.getCoupons);
 router.get('/add-coupon', isAuth.adminAuth, couponController.getAddCoupon);
 router.post('/add-coupon', isAuth.adminAuth, couponController.addCoupon);
@@ -74,7 +73,6 @@ router.get('/coupons',isAuth.userAuth,couponController.getCoupons)
 
 //offer management 
 
-
 router.get('/offers',isAuth.adminAuth,offerController.getOffers)
 router.get('/add-offer',isAuth.adminAuth,offerController.getAddOffer)
 router.post('/add-offer',isAuth.adminAuth,offerController.addOffer)
@@ -86,5 +84,9 @@ router.patch( '/apply-product-offer', isAuth.adminAuth, productController.applyP
 router.patch( '/remove-product-offer', isAuth.adminAuth, productController.removeProductOffer )
 router.patch( '/apply-category-offer', isAuth.adminAuth, categoryController.applyCategoryOffer )
 router.patch( '/remove-category-offer', isAuth.adminAuth, categoryController.removeCategoryOffer )
+
+//get sales report 
+
+router.get('/sales-report',isAuth.adminAuth,orderController.getSalesReport)
 
 module.exports = router

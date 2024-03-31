@@ -3,87 +3,19 @@ const cartSchema = require('../model/cartModel')
 const productSchema = require('../model/productModel')
 const userSchema = require('../model/userModels')
 const cartHelper = require('../helpers/cartHelper')
+const couponHelper = require('../helpers/cartHelper')
 const paginationHelper=require('../helpers/paginationHelper')
 
 const crypto=require('crypto')
 const { log } = require('console')
 
 module.exports = {
-    // placeOrder : async (req,res) =>{
-    //     try{
-    //         const {user} = req.session
-    //         const products = await cartHelper.totalCartPrice(user)
-    //         const {paymentMethod , addressId} = req.body
-    //         const productCount = await cartHelper.updateQuantity(user)
-
-    //         if(productCount){
-    //             // if the product is not availabile when we are checkout
-    //             req.session.productCount -= productCount
-    //             return res.json({outofStock : true})
-    //         }else{
-    //             const productItems = products[0].items 
-
-
-    //             // adding individual product details 
-    //             const cartProducts = productItems.map(items => ({
-    //                 productId : items.productId,
-    //                 quantity : items.quantity,
-    //                 price : items.price
-    //             }))
-
-    //             const cart = await cartSchema.findOne({userId:user})
-    //             const totalPrice = totalAmount[0].totalAmount
-
-    //             const generatedId = Math.floor(100000 + Math.random() * 900000)
-    //             let existingOrder = await orderSchema.findOne({orderId : generatedId})
-
-    //             while(existingOrder){
-    //                 generatedId = Math.floor(100000 + Math.random() * 900000)
-    //                 existingOrder = await orderSchema.findOne({orderId : generatedId})
-    //             }
-
-
-    //             const orderId = `ORD${generatedId}`
-    //             const orderStatus = paymentMethod === 'COD' ? 'Confirmed' : 'pending'
-                
-    //             const order = new orderSchema({
-    //                 userId : user,
-    //                 orderId : orderId,
-    //                 products : cartProducts,
-    //                 totalPrice : totalPrice,
-    //                 paymentMethod : paymentMethod,
-    //                 orderStatus : orderStatus,
-    //                 address : addressId
-    //             })
-
-    //             const ordered = await order.save()
-
-
-    //             for(const items of cartProducts){
-    //                 const {productId , quantity} = items
-    //                 await productSchema.updateOne({_id:productId},{$inc : {quantity : -quantity}})
-    //             }
-
-
-    //             await cartSchema.deleteOne({userId : user})
-    //             req.session.productCount = 0
-    //             return res.json({success : true})
-
-
-    //         } 
-
-    //     }catch(error){
-    //         console.log(error);
-    //     }
-    // }
-
-
     placeOrder : async ( req, res ) => {
         try {
           
             const { user } = req.session
             const products =  await cartHelper.totalCartPrice( user )
-            const { paymentMethod, addressId ,walletAmount} = req.body
+            const { paymentMethod, addressId, walletAmount } = req.body
             const productCount = await cartHelper.updateQuantity( user )
             if( productCount){
                 //If product is not available when we are at checkout
@@ -104,6 +36,7 @@ module.exports = {
             const cart = await cartSchema.findOne({ userId : user })
             const totalAmount = await cartHelper.totalCartPrice( user )
             let discounted=0
+            console.log(cart.coupon)
             if( cart && cart.coupon && totalAmount && totalAmount.length > 0 ) {
                 discounted = await couponHelper.discountPrice( cart.coupon, totalAmount[0].total )
                 await couponSchema.updateOne({ _id : cart.coupon},{
@@ -182,11 +115,12 @@ module.exports = {
                         })
                     }
                     return res.json({ success : true})
-            } else if( paymentMethod === 'razorpay'){
-                // Razorpay 
-                const payment = await paymentHelper.razorpayPayment( ordered._id, amountPayable )
-                res.json({ payment : payment , success : false  })
             }
+            //  else if( paymentMethod === 'razorpay'){
+            //     // Razorpay 
+            //     const payment = await paymentHelper.razorpayPayment( ordered._id, amountPayable )
+            //     res.json({ payment : payment , success : false  })
+            // }
         }
         } catch ( error ) {
             res.redirect('/500')
@@ -426,5 +360,83 @@ module.exports = {
         }catch(error){
             console.log(error);
         }
+    },
+    getSalesReport: async (req, res) => {
+    try {
+        const { from, to, seeAll, sortData, sortOrder } = req.query;
+        const orders = await orderSchema.find();
+        const overallSalesCount = orders.length;
+
+        let overallOrderAmount = 0;
+        for (const order of orders) {
+            overallOrderAmount += order.totalPrice;
+        }
+
+        // Calculate Overall discount
+        let overallDiscount = 0;
+        for (const order of orders) {
+            overallDiscount += order.discount; // Assuming discount is a field in your order schema
+        }
+
+        let page = Number(req.query.page);
+        if (isNaN(page) || page < 1) {
+            page = 1;
+        }
+        const conditions = {};
+        if (from && to) {
+            conditions.date = {
+                $gte: from,
+                $lte: to
+            };
+        } else if (from) {
+            conditions.date = {
+                $gte: from
+            };
+        } else if (to) {
+            conditions.date = {
+                $lte: to
+            };
+        }
+
+        const sort = {};
+        if (sortData) {
+            if (sortOrder === "Ascending") {
+                sort[sortData] = sortData === "totalPrice" ? 1 : sortOrder;
+
+            } else if (sortOrder === "Descending") {
+                sort[sortData] = -1;
+            }
+        } else {
+            sort['date'] = sortOrder === "Ascending" ? 1 : -1;
+        }
+
+        const orderCount = await orderSchema.countDocuments();
+        const limit = seeAll === "seeAll" ? orderCount : paginationHelper.SALES_PER_PAGE;
+        const filteredOrders = await orderSchema.find(conditions)
+            .sort(sort)
+            .skip((page - 1) * paginationHelper.ORDER_PER_PAGE.limit)
+            .limit(limit);
+
+        res.render('admin/sales-report', {
+            admin: true,
+            orders: filteredOrders,
+            from: from,
+            to: to,
+            seeAll: seeAll,
+            currentPage: page,
+            hasNextPage: page * paginationHelper.SALES_PER_PAGE < orderCount,
+            hasPrevPage: page > 1,
+            nextPage: page + 1,
+            prevPage: page - 1,
+            lastPage: Math.ceil(orderCount / paginationHelper.SALES_PER_PAGE),
+            sortData: sortData,
+            sortOrder: sortOrder,
+            overallSalesCount: overallSalesCount,
+            overallOrderAmount: overallOrderAmount,
+            overallDiscount: overallDiscount
+        });
+    } catch (error) {
+        console.log(error);
     }
+}
 }
