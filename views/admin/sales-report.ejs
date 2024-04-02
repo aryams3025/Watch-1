@@ -152,8 +152,11 @@
                       <p class="summary">Overall order amount  : <%= overallOrderAmount %></p>
                   </div>
                   <div class="col">
-                      <p class="summary">Overall discount      : <%= overallDiscount %></p>
+                      <p class="summary">Overall discount      : <%=  overallDiscount %></p>
                   </div>
+                  <div class="col">
+                    <p class="summary">Overall coupon deduction  : <%=  overallCouponDeduction %></p>
+                </div>
               </div>
           </div>
           
@@ -163,24 +166,30 @@
       </div>
 
       <!-- Pagination buttons -->
-      <% if( !seeAll ) { %>
-
-        <div class="pagination-btn">
-          <% if( currentPage !== 1 ) { %> 
+     <!-- Pagination -->
+<% if( !seeAll ) { %>
+  <div class="pagination-btn">
+      <!-- First page button -->
+      <% if( currentPage !== 1 ) { %> 
           <a href="/admin/sales-report?page=1<% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 1">1</button></a>
-        <% } %>
-        <% if( currentPage > 2 ) { %>
-            <a href="/admin/sales-report?page=<%= prevPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 2"><%= prevPage %></button></a> 
-        <% } %>
-        <a href="/admin/sales-report?page=<%= currentPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 3 active"><%= currentPage %></button></a>
-        <% if( hasNextPage ) { %>
-            <a href="/admin/sales-report?page=<%= nextPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 4"><%= nextPage %></button></a> 
-        <% } %>    
-        <% if( nextPage !== lastPage && currentPage !== lastPage ) { %>
-            <a href="/admin/sales-report?page=<%= lastPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 5"><%= lastPage %></button></a>
-        <% } %>
-    </div>
-    <% } %>
+      <% } %>
+      <!-- Previous page button -->
+      <% if( currentPage > 2 ) { %>
+          <a href="/admin/sales-report?page=<%= prevPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 2"><%= prevPage %></button></a> 
+      <% } %>
+      <!-- Current page button -->
+      <a href="/admin/sales-report?page=<%= currentPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 3 active"><%= currentPage %></button></a>
+      <!-- Next page button -->
+      <% if( hasNextPage ) { %>
+          <a href="/admin/sales-report?page=<%= nextPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 4"><%= nextPage %></button></a> 
+      <% } %>    
+      <!-- Last page button -->
+      <% if( nextPage !== lastPage && currentPage !== lastPage ) { %>
+          <a href="/admin/sales-report?page=<%= lastPage %><% if ( sortData ) {%>&sortData=<%= sortData %><% } %><% if ( sortOrder ) {%>&sortOrder=<%= sortOrder %><% } %>"><button type="button" class="btn btn-outline-secondary 5"><%= lastPage %></button></a>
+      <% } %>
+  </div>
+<% } %>
+
 
     </div>
   </div>

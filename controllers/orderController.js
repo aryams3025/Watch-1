@@ -3,16 +3,17 @@ const cartSchema = require('../model/cartModel')
 const productSchema = require('../model/productModel')
 const userSchema = require('../model/userModels')
 const cartHelper = require('../helpers/cartHelper')
-const couponHelper = require('../helpers/cartHelper')
+const couponHelper = require('../helpers/couponHelper')
 const paginationHelper=require('../helpers/paginationHelper')
-
+const couponSchema=require('../model/couponModel')
+const {RAZORPAY_KEY_SECRET}=process.env
 const crypto=require('crypto')
+const paymentHelper = require('../helpers/paymentHelper')
 const { log } = require('console')
 
 module.exports = {
     placeOrder : async ( req, res ) => {
         try {
-          
             const { user } = req.session
             const products =  await cartHelper.totalCartPrice( user )
             const { paymentMethod, addressId, walletAmount } = req.body
@@ -35,8 +36,7 @@ module.exports = {
             }))
             const cart = await cartSchema.findOne({ userId : user })
             const totalAmount = await cartHelper.totalCartPrice( user )
-            let discounted=0
-            console.log(cart.coupon)
+            let  discounted={}
             if( cart && cart.coupon && totalAmount && totalAmount.length > 0 ) {
                 discounted = await couponHelper.discountPrice( cart.coupon, totalAmount[0].total )
                 await couponSchema.updateOne({ _id : cart.coupon},{
@@ -47,6 +47,7 @@ module.exports = {
             }
             let discountAmount=0
             if(discounted.discountAmount>0){
+                console.log('hai');
              discountAmount=discounted.discountAmount
             }
             const totalPrice = discounted && discounted.discountedTotal ? discounted.discountedTotal : totalAmount[0].total
@@ -74,8 +75,13 @@ module.exports = {
             // Use the generated unique orderId for the new order
             const orderId = `ORD${generatedID}`;
             
-            paymentMethod === 'COD' ? orderStatus = 'Confirmed' : orderStatus = 'Pending';
-            if( amountPayable === 0) { orderStatus = 'Confirmed' }
+            // paymentMethod === 'COD' ? orderStatus = 'Confirmed' : orderStatus = 'Pending';
+            // if( amountPayable === 0) { orderStatus = 'Confirmed' }
+            if (paymentMethod === 'COD' || amountPayable === 0) {
+                orderStatus = 'Confirmed';
+            } else if (paymentMethod === 'razorpay') {
+                orderStatus = 'Confirmed'; // Update this line to set status to 'Confirmed' for Razorpay
+            }
             const order = new orderSchema({
                 userId : user,
                 orderId:orderId,
@@ -88,7 +94,7 @@ module.exports = {
                 amountPayable : amountPayable,
                 discounted:discountAmount
             })
-            const ordered = await order.save()
+            const ordered= await order.save()
             // Decreasing quantity
             for( const items of cartProducts ){
                 const { productId, quantity } = items
@@ -116,11 +122,11 @@ module.exports = {
                     }
                     return res.json({ success : true})
             }
-            //  else if( paymentMethod === 'razorpay'){
-            //     // Razorpay 
-            //     const payment = await paymentHelper.razorpayPayment( ordered._id, amountPayable )
-            //     res.json({ payment : payment , success : false  })
-            // }
+             else if( paymentMethod === 'razorpay'){
+                // Razorpay 
+                const payment = await paymentHelper.razorpayPayment( ordered._id, amountPayable )
+                res.json({ payment : payment , success : false  })
+            }
         }
         } catch ( error ) {
             res.redirect('/500')
@@ -346,7 +352,7 @@ module.exports = {
             if(status === 'Cancelled'){
                 // if the order is cancelled 
                 const order = await orderSchema.findOne({_id : orderId})
-                for(let produts of order.products){
+                for(let products of order.products){
                     await productSchema.updateOne({_id : products.productId},{$inc : {quantity : products.quantity}})
 
                 }
@@ -368,6 +374,9 @@ module.exports = {
         const overallSalesCount = orders.length;
 
         let overallOrderAmount = 0;
+        
+       
+        
         for (const order of orders) {
             overallOrderAmount += order.totalPrice;
         }
@@ -375,9 +384,13 @@ module.exports = {
         // Calculate Overall discount
         let overallDiscount = 0;
         for (const order of orders) {
-            overallDiscount += order.discount; // Assuming discount is a field in your order schema
+            overallDiscount += order.discount; // Assuming 'discount' is the correct field name in your order schema
+            
         }
-
+        let overallCouponDeduction = 0;
+        for (const order of orders) {
+        overallCouponDeduction += order.couponDeduction || 0
+        }
         let page = Number(req.query.page);
         if (isNaN(page) || page < 1) {
             page = 1;
@@ -433,7 +446,8 @@ module.exports = {
             sortOrder: sortOrder,
             overallSalesCount: overallSalesCount,
             overallOrderAmount: overallOrderAmount,
-            overallDiscount: overallDiscount
+            overallDiscount: overallDiscount,
+            overallCouponDeduction : overallCouponDeduction
         });
     } catch (error) {
         console.log(error);

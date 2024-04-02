@@ -2,7 +2,6 @@ const couponSchema=require('../model/couponModel')
 
 module.exports={
     discountPrice:async(couponId,cartTotal)=>{
-        console.log(cartTotal,couponId)
         const coupon=await couponSchema.findById(couponId)
         if(!coupon){
             return{

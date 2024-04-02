@@ -1,137 +1,46 @@
 <%- include('../includes/admin/adminHead.ejs') %>
 <%- include('../includes/admin/adminNavbar.ejs') %>
 
-<% var sdate = new Date(offer.startingDate).toISOString().split('T')[0] %>
-<% var edate = new Date(offer.expiryDate).toISOString().split('T')[0] %>
+<% var sdate = offer && offer.startingDate ? new Date(offer.startingDate).toISOString().split('T')[0] : ''; %>
+<% var edate = offer && offer.expiryDate ? new Date(offer.expiryDate).toISOString().split('T')[0] : ''; %>
 
 <div class="main-panel">
     <div class="content-wrapper">
-      <div class="col-12 grid-margin stretch-card">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title">Edit Offer</h4>
-            <div id="errorContainer" class="alert alert-danger" style="display: none;"></div> <!-- Error container -->
-  
-            <form id="offer-form" class="forms-sample" action="/admin/edit-offer" method="POST" >
-              <div class="form-group">
-                <label >Offer name</label>
-                <input type="text" class="form-control" id="offer-name" name="name" value="<%= offer.name %>" placeholder="offer name" required>
-              </div>
-              <div class="form-group">
-                <label>Starting date</label>
-                <input type="date" class="form-control" id="Starting-date" name="startingDate" value="<%= sdate %>" placeholder="Starting date" required oninput="validateStartingDate()">
-                <div id="date-validation-message" style="color: red;"></div>
-              </div>
-              <div class="form-group">
-                <label>Expiry date</label>
-                <input type="date" class="form-control" id="expiry-date" name="expiryDate" value="<%= edate %>" placeholder="Expiry date" required oninput="validateExpiryDate()">
-                <div id="expiry-validation-message" style="color: red;"></div>
-              </div>
-              
-              <div class="form-group">
-                <label >Percentage</label>
-                <input type="number" class="form-control" id="percentage" name="percentage" value="<%= offer.percentage %>" placeholder="Percentage" required>
-              </div>
-              <input type="hidden" name="id" value="<%= offer._id %>" id="">
-  
-              <button type="submit" class="btn btn-primary mr-2">Submit</button>
-              <a href="/admin/offers"><button type="button" class="btn  mr-2">Cancel</button></a>
-            </form>
-          </div>
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Edit Offer</h4>
+                    <div id="errorContainer" class="alert alert-danger" style="display: none;"></div> <!-- Error container -->
+
+                    <form id="offer-form" class="forms-sample" action="/admin/edit-offer" method="POST">
+                        <div class="form-group">
+                            <label>Offer name</label>
+                            <input type="text" class="form-control" id="offer-name" name="name" value="<%= offer && offer.name ? offer.name : '' %>" placeholder="Offer name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Starting date</label>
+                            <input type="date" class="form-control" id="Starting-date" name="startingDate" value="<%= sdate %>" placeholder="Starting date" required oninput="validateStartingDate()">
+                            <div id="date-validation-message" style="color: red;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Expiry date</label>
+                            <input type="date" class="form-control" id="expiry-date" name="expiryDate" value="<%= edate %>" placeholder="Expiry date" required oninput="validateExpiryDate()">
+                            <div id="expiry-validation-message" style="color: red;"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Percentage</label>
+                            <input type="number" class="form-control" id="percentage" name="percentage" value="<%= offer && offer.percentage ? offer.percentage : '' %>" placeholder="Percentage" required>
+                        </div>
+                        <input type="hidden" name="id" value="<%= offer && offer._id ? offer._id : '' %>" id="">
+
+                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                        <a href="/admin/offers"><button type="button" class="btn  mr-2">Cancel</button></a>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  
 </div>
-</div>
-
-<script>
-  const formOffer = document.getElementById('offer-form')
-  formOffer.addEventListener('submit', ( event ) => {
-  const errorContainer = document.getElementById('errorContainer')
-  const name = document.getElementById('offer-name').value.trim()
-  const startingDate = document.getElementById('Starting-date').value.trim()
-  const expiryDate = document.getElementById('expiry-date').value.trim()
-  const percentage= document.getElementById('percentage').value.trim()
-  errorContainer.innerHTML = ""
-  errorContainer.style.display = 'none'
-  
-  const now = new Date()
-  if( !name || !startingDate || !expiryDate || !percentage ) {
-    
-    event.preventDefault()
-    errorContainer.innerHTML = "All fields should be filled"
-    errorContainer.style.display = 'block'
-  }
-  
-  if( name.length < 5 ) {
-    
-    event.preventDefault()
-    errorContainer.innerHTML = "Name should contains atleast 4 letters"
-    errorContainer.style.display = 'block'
-  }
-  
-  const pattern = /^[a-zA-Z0-9]+$/
-  if( !pattern.test(name)){
-   
-    event.preventDefault()
-    errorContainer.innerHTML = "Name should not contains symbols or spaces"
-    errorContainer.style.display = 'block'
-  }
-  
-  if( startingDate > expiryDate || expiryDate < now  ) {
-    
-    event.preventDefault()
-    errorContainer.innerHTML = "Enter a valid date"
-    errorContainer.style.display = 'block'
-  }
- 
-  
-  if(  percentage > 100 || percentage < 0 )   {
-   
-    event.preventDefault()
-    errorContainer.innerHTML = "Percentage cannot be greater than 100 or less than zero"
-    errorContainer.style.display = 'block'
-  }
-  
- 
-  
-})
-function validateStartingDate() {
-    const startingDateInput = document.getElementById('Starting-date');
-    const validationMessage = document.getElementById('date-validation-message');
-    
-    const selectedDate = new Date(startingDateInput.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set time to the beginning of the day
-
-    if (selectedDate < today) {
-      validationMessage.textContent = 'Starting date must be today or in the future.';
-      startingDateInput.setCustomValidity('Invalid');
-    } else {
-      validationMessage.textContent = '';
-      startingDateInput.setCustomValidity('');
-    }
-  }
-  function validateExpiryDate() {
-    const expiryDateInput = document.getElementById('expiry-date');
-    const validationMessage = document.getElementById('expiry-validation-message');
-    
-    const selectedDate = new Date(expiryDateInput.value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set time to the beginning of the day
-
-    if (selectedDate <= today) {
-      validationMessage.textContent = 'Expiry date must be greater than today.';
-      expiryDateInput.setCustomValidity('Invalid');
-    } else {
-      validationMessage.textContent = '';
-      expiryDateInput.setCustomValidity('');
-    }
-  }
-
-
-</script>
 
 <%- include('../includes/admin/adminFooter.ejs') %>

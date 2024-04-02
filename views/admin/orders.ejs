@@ -97,34 +97,36 @@
                   <td><%= order.orderId %></td>
                   <td> <%= order.paymentMethod %> </td>
                   <td> <%= order.totalPrice %> </td>
-                  <td id="order-status-<%= order._id %>"> <% if(order.orderStatus) { %> <%= order.orderStatus %> <% } else { %> Pending <% } %> </td>
-                  <td>
-                    <% if( order.orderStatus === 'Confirmed' || order.orderStatus === 'Shipping' ){ %>
-                    <div class="dropdown" id="dropdown-<%= order._id %>">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Change order status</button>
-                        <div class="dropdown-menu bg-light text-dark" aria-labelledby="dropdownMenuButton1">
-                            <% if( order.orderStatus === 'Confirmed'){ %>
-                                <a id="delivered-<%= order._id %>" onclick="changeOrderStatus('Delivered','<%= order._id %>')" class="text-dark dropdown-item">Delivered</a>
-                                <a id="shipping-<%= order._id %>" onclick="changeOrderStatus('Shipping','<%= order._id %>')" class="text-dark dropdown-item">Shipping</a>
-                                <a id="cancelled-<%= order._id %>" onclick="changeOrderStatus('Cancelled','<%= order._id %>')" class="text-dark dropdown-item">Cancelled</a>
-                            <% } else { %>
-                                <% if( order.orderStatus === 'Shipping' ){ %>
-                                    <a id="delivered-<%= order._id %>" onclick="changeOrderStatus('Delivered','<%= order._id %>')" class="text-dark dropdown-item">Delivered</a>
-                                    <a id="cancelled-<%= order._id %>" onclick="changeOrderStatus('Cancelled','<%= order._id %>')" class="text-dark dropdown-item">Cancelled</a>
-                                <% } %>
-                            <% } %>
-                        </div>
-                    </div>
-                    <% } else if ( order.orderStatus === 'Pending' ) { %>
-                        <div class="dropdown" id="dropdown-<%= order._id %>">
-                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Dropdown </button>
-                            <div class="dropdown-menu bg-light text-dark" aria-labelledby="dropdownMenuButton1">
-                                <a id="cancelled-<%= order._id %>" onclick="changeOrderStatus('Cancelled','<%= order._id %>')" class="text-dark dropdown-item">Cancelled</a>
-                            </div>
-                        </div>
-                    <% } %>
-                    
-                  </td>
+                  
+                <td id="order-status-<%= order._id %>"> <% if(order.orderStatus) { %> <%= order.orderStatus %> <% } else { %> Pending <% } %> </td>
+                <td>
+                  <% if( order.orderStatus === 'Confirmed' || order.orderStatus === 'Shipping' ){ %>
+                  <div class="dropdown" id="dropdown-<%= order._id %>">
+                      <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Change order status</button>
+                      <div class="dropdown-menu bg-light text-dark" aria-labelledby="dropdownMenuButton1">
+                          <% if( order.orderStatus === 'Confirmed'){ %>
+                              <a id="delivered-<%= order._id %>" onclick="changeOrderStatus('Delivered','<%= order._id %>')" class="text-dark dropdown-item">Delivered</a>
+                              <a id="shipping-<%= order._id %>" onclick="changeOrderStatus('Shipping','<%= order._id %>')" class="text-dark dropdown-item">Shipping</a>
+                              <a id="cancelled-<%= order._id %>" onclick="changeOrderStatus('Cancelled','<%= order._id %>')" class="text-dark dropdown-item">Cancelled</a>
+                          <% } else { %>
+                              <% if( order.orderStatus === 'Shipping' ){ %>
+                                  <a id="delivered-<%= order._id %>" onclick="changeOrderStatus('Delivered','<%= order._id %>')" class="text-dark dropdown-item">Delivered</a>
+                                  <a id="cancelled-<%= order._id %>" onclick="changeOrderStatus('Cancelled','<%= order._id %>')" class="text-dark dropdown-item">Cancelled</a>
+                              <% } %>
+                          <% } %>
+                      </div>
+                  </div>
+                  <% } else if ( order.orderStatus === 'Pending' ) { %>
+                      <div class="dropdown" id="dropdown-<%= order._id %>">
+                          <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Change order status </button>
+                          <div class="dropdown-menu bg-light text-dark" aria-labelledby="dropdownMenuButton1">
+                              <a id="cancelled-<%= order._id %>" onclick="changeOrderStatus('Cancelled','<%= order._id %>')" class="text-dark dropdown-item">Cancelled</a>
+                          </div>
+                      </div>
+                  <% } %>
+                  
+                </td>
+                
                   
                   
                   <td>
