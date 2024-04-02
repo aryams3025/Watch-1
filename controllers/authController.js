@@ -243,7 +243,20 @@ module.exports={
     doAdminLogout:(req,res)=>{
         try{
             req.session.admin=null
+            req.session.destroy(function(err) {
+                if (err) {
+                    // Handle error if session cannot be destroyed
+                    res.redirect('/500');
+                } else {
+                    // Emit an event to notify other tabs to log out
+                    io.emit('logout', req.sessionID); // Assuming you're using Socket.IO for real-time communication
+        
+                    // Redirect to login page
+                    res.redirect('/admin-login');
+                }
+            });
             res.redirect('/admin-login')
+            
         }catch(error){
             res.redirect('/500')
         }

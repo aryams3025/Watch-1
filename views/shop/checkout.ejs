@@ -164,7 +164,7 @@ function razorpayPayment( order ) {
         "key": rzp_key, // Enter the Key ID generated from the Dashboard
         "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
         "currency": "INR",
-        "name": "Male fashion", //your business name
+        "name": "Tempu", //your business name
         "description": "Test Transaction",
         "image": "/user/img/logo.png",
         "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
@@ -172,7 +172,7 @@ function razorpayPayment( order ) {
             verifyPayment( response, order )
         },
         "notes": {
-            "address": "Male fashion office"
+            "address": "Watches"
         },
         "theme": {
             "color": "#3399cc"

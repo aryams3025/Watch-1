@@ -25,21 +25,17 @@ router.get('/checkout',isAuth.userAuth,isBlocked.isBlocked,shopController.getChe
 router.get('/add-checkout-address',isAuth.userAuth,isBlocked.isBlocked,shopController.getCheckoutAddAddress)
 router.post('/add-checkout-address',isAuth.userAuth,isBlocked.isBlocked,shopController.checkoutAddAddress)
 
-
 router.post('/place-order',isAuth.userAuth,isBlocked.isBlocked,orderController.placeOrder)
 router.get('/confirm-order',isAuth.userAuth,isBlocked.isBlocked,orderController.getConfirmOrder)
-
-
-
 
 router.post('/add-to-wishlist',isAuth.userAuth,wishlistController.addToWishlist)
 router.get ( '/wishlist', isAuth.userAuth, wishlistController.getWishlist )
 router.put( '/remove-wishlist-item', isAuth.userAuth, wishlistController.removeItem )
 
 
-router.post('/apply-coupon',isAuth.userAuth,couponController.applyCoupon)
+router.post('/apply-coupon',isAuth.userAuth,couponController.applyCoupn)
 router.get('/cancelCoupon',isAuth.userAuth,couponController.cancelCouponuser)
-
+//router.get('/availabile-coupons',isAuth.userAuth,couponController.getAvailabileCoupons)
 
 
 module.exports = router;

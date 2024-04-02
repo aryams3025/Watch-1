@@ -118,81 +118,7 @@ module.exports = {
         }
     },
 
-    //getProductDetails: async (req, res) => {
-    //     try {
-    //         const { search, sortData, sortOrder } = req.query || {};
-    //         let page = Number(req.query && req.query.page) || 1;
-    
-    //         const sort = {};
-    //         const condition = {};
-    //         if (sortData) {
-    //             sort[sortData] = sortOrder === 'Ascending' ? 1 : -1;
-    //         }
-    //         if (search) {
-    //             condition.$or = [
-    //                 { name: { $regex: search, $options: 'i' } },
-    //                 { brand: { $regex: search, $options: 'i' } },
-    //                 { description: { $regex: search, $options: 'i' } },
-    //             ];
-    //         }
-    
-    //         // Get total quantity of products
-    //         const totalProducts = await productSchema.find(condition).countDocuments();
-    
-    //         // Get all orders
-    //         const orders = await orderSchema.find();
-    
-    //         // Calculate total quantity ordered for each product
-    //         const productQuantities = {};
-    //         orders.forEach(order => {
-    //             order.products.forEach(product => {
-    //                 const productId = product.productId.toString();
-    //                 const quantity = product.quantity;
-    //                 if (!productQuantities[productId]) {
-    //                     productQuantities[productId] = 0;
-    //                 }
-    //                 productQuantities[productId] += quantity;
-    //             });
-    //         });
-    
-    //         // Get products with calculated stock left
-    //         const products = await productSchema.find(condition)
-    //             .populate('category')
-    //             .populate('offer')
-    //             .populate('brand')
-    //             .sort(sort)
-    //             .skip((page - 1) * paginationHelper.PRODUCT_PER_PAGE)
-    //             .limit(paginationHelper.PRODUCT_PER_PAGE);
-    
-    //         // Calculate and assign stock left for each product
-    //         products.forEach(product => {
-    //             const productId = product._id.toString();
-    //             const orderedQuantity = productQuantities[productId] || 0;
-    //             const stockLeft = product.quantity - orderedQuantity;
-    //             product.stockLeft = stockLeft >= 0 ? stockLeft : 0;
-    //         });
-    
-    //         const categories = await categorySchema.find();
-            
-    //         res.render('admin/products', {
-    //             admin: req.session.admin,
-    //             products: products || [],
-    //             categories: categories,
-    //             stockLeft: totalProducts, // Assign totalProducts as stockLeft
-    //             currentPage: page,
-    //             hasNextPage: page * paginationHelper.PRODUCT_PER_PAGE < totalProducts,
-    //             hasPrevPage: page > 1,
-    //             nextPage: page + 1,
-    //             prevPage: page - 1,
-    //             lastPage: Math.ceil(totalProducts / paginationHelper.PRODUCT_PER_PAGE),
-    //             search: search,
-    //             sortData: sortData,
-    //             sortOrder: sortOrder,
-    //         });
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // },
+   
     
 
     editProduct: async (req, res) => {
@@ -296,4 +222,42 @@ module.exports = {
             console.log(error);
         }
     },
+    geteditOffer : async(req,res) =>{
+        try{
+            const {id}=req.params
+            const offer=await offerSchema.findOne({_id:id})
+            res.render('admin/edit-offer',{
+                admin:true,
+                offer:offer
+            })
+        }catch(error){
+            console.log(error);
+        }
+    },
+    applyProductOffer:async(req,res)=>{
+        try{
+            const {offerId,productId}=req.body
+            await productSchema.updateOne({_id:productId},{$set:{
+                offer:offerId
+            }})
+            res.json({success:true})
+        }catch(error){
+            res.redirect('/500')
+        }
+    },
+    //Remove the product offer
+    removeProductOffer:async(req,res)=>{
+        try{
+            const {productId}=req.body
+            await productSchema.updateOne({_id:productId},{
+                $unset:{
+                    offer:""
+                }
+            })
+            res.json({success:true})
+        }catch(error){
+            res.redirect('/500')
+        }
+    },
+    
 };

@@ -83,18 +83,7 @@ if (sortData) {
         }
         
     },
-    // geteditCategory : async(req,res)=>{
-    //     try {
-    //         const categories = await categorySchema.findOne({ _id: req.params.id });
-    //         console.log(category)
-    //         req.session.admin = true; 
-    //         //session assignment, replace with your actual session logic
-    //         res.render('admin/edit-category', { categories: categories , admin: req.session.admin }); // Pass category data to the view
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-        
-    // },
+  
     
     geteditCategory: async (req, res) => {
         try {
@@ -150,6 +139,8 @@ if (sortData) {
             res.redirect('/500')
         }
     },
+
+    
     deleteCategory :async(req,res)=>{
         try{
             await categorySchema.deleteOne({_id:req.params.id})
@@ -157,5 +148,33 @@ if (sortData) {
         }catch(error){
             console.log(error);
         }
-    }
+    },
+     //applying category offer
+     applyCategoryOffer:async(req,res)=>{
+        try{
+            const {offerId,categoryId}=req.body
+            await categorySchema.updateOne({_id:categoryId},{
+                $set:{
+                    offer:offerId
+                }
+            })
+            res.json({success:true})
+        }catch(error){
+            res.redirect('/500')
+        }
+    },
+    //cancel the categry offer
+    removeCategoryOffer:async(req,res)=>{
+        try{
+            const {categoryId}=req.body
+            await categorySchema.updateOne({_id:categoryId},{
+                $unset:{
+                    offer:""
+                }
+            })
+            res.json({success:true})
+        }catch(error){
+            res.redirect('/500')
+        }
+    },
 }

@@ -1,8 +1,6 @@
 <%- include('../includes/admin/adminHead.ejs') %>
 <%- include('../includes/admin/adminNavbar.ejs') %>
 
-<% var sdate = new Date(coupon.startingDate).toISOString().split('T')[0] %>
-<% var edate = new Date(coupon.expiryDate).toISOString().split('T')[0] %>
 
 
 <div class="main-panel">
@@ -10,52 +8,32 @@
       <div class="col-12 grid-margin stretch-card">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Edit Coupon</h4>
+            <h4 class="card-title">Add Offer</h4>
             <div id="errorContainer" class="alert alert-danger" style="display: none;"></div> <!-- Error container -->
   
-            <form id="coupon-form" class="forms-sample" action="/admin/edit-coupon" method="POST" >
+            <form id="offer-form" class="forms-sample" action="/admin/add-offer" method="POST" >
               <div class="form-group">
-                <label >Coupon name</label>
-                <input type="text" class="form-control" id="coupon-name" name="name" value="<%= coupon.name %>" placeholder="Coupon name" required>
-              </div>
-              <div class="form-group">
-                <label >Coupon description</label>
-                <input type="text" class="form-control" id="coupon-description" name="description" value="<%= coupon.description %>" placeholder="Coupon description" required>
+                <label >Offer name</label>
+                <input type="text" class="form-control" id="offer-name" name="name" placeholder="Offer name" required>
               </div>
               <div class="form-group">
                 <label>Starting date</label>
-                <input type="date" class="form-control" id="Starting-date" name="startingDate" value="<%= sdate %>" placeholder="Starting date" required oninput="validateStartingDate()">
+                <input type="date" class="form-control" id="Starting-date" name="startingDate" placeholder="Starting date" required oninput="validateStartingDate()">
                 <div id="date-validation-message" style="color: red;"></div>
               </div>
               <div class="form-group">
                 <label>Expiry date</label>
-                <input type="date" class="form-control" id="expiry-date" name="expiryDate" value="<%= edate %>" placeholder="Expiry date" required oninput="validateExpiryDate()">
+                <input type="date" class="form-control" id="expiry-date" name="expiryDate" value="" placeholder="Expiry date" required oninput="validateExpiryDate()">
                 <div id="expiry-validation-message" style="color: red;"></div>
               </div>
               
-
               <div class="form-group">
-                <label >Minimum amount</label>
-                <input type="number" class="form-control" id="minimum-amount" name="minimumAmount" value="<%= coupon.minimumAmount %>" placeholder="Minimum amount" required>
+                <label >Amount</label>
+                <input type="number" class="form-control" id="percentage" name="percentage" placeholder="Percentage" required>
               </div>
 
-              <div class="form-group">
-                <label for="discount-type">Discount type</label>
-                <select style="color: #fff" class="form-control" name="discountType" value="<%= coupon.discountType %>" id="discount-type" required>
-                  <option style="color: #fff;" value="percentage">Percentage</option>
-                  <option style="color: #fff" value="fixed-amount">Fixed amount</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label >Discount</label>
-                <input type="number" class="form-control" id="discount" name="discount" value="<%= coupon.discount %>" placeholder="Discount" required>
-              </div>
-              <input type="hidden" name="id" value="<%= coupon._id %>" id="">
-              
-  
               <button type="submit" class="btn btn-primary mr-2">Submit</button>
-              <a href="/admin/coupons"><button type="button" class="btn  mr-2">Cancel</button></a>
+              <a href="/admin/offers"><button type="button" class="btn  mr-2">Cancel</button></a>
             </form>
           </div>
         </div>
@@ -66,22 +44,20 @@
 </div>
 </div>
 
+
 <script>
-  const formCoupon = document.getElementById('coupon-form')
-  formCoupon.addEventListener('submit', ( event ) => {
+  const formOffer = document.getElementById('offer-form')
+  formOffer.addEventListener('submit', ( event ) => {
   const errorContainer = document.getElementById('errorContainer')
-  const name = document.getElementById('coupon-name').value.trim()
-  const description = document.getElementById('coupon-description').value.trim()
+  const name = document.getElementById('offer-name').value.trim()
   const startingDate = document.getElementById('Starting-date').value.trim()
   const expiryDate = document.getElementById('expiry-date').value.trim()
-  const minimumAmount = document.getElementById('minimum-amount').value.trim()
-  const discountType = document.getElementById('discount-type').value.trim()
-  const discount = document.getElementById('discount').value.trim()
+  const percentage = document.getElementById('percentage').value.trim()
   errorContainer.innerHTML = ""
   errorContainer.style.display = 'none'
   console.log(name);
   const now = new Date()
-  if( !name || !description || !startingDate || !expiryDate || !minimumAmount || !discountType || !discount ) {
+  if( !name || !startingDate || !expiryDate || !percentage ) {
     
     event.preventDefault()
     errorContainer.innerHTML = "All fields should be filled"
@@ -89,35 +65,29 @@
   }
   
   if( name.length < 5 ) {
-   
+    
     event.preventDefault()
     errorContainer.innerHTML = "Name should contains atleast 4 letters"
     errorContainer.style.display = 'block'
   }
+
   
   const pattern = /^[a-zA-Z0-9]+$/
   if( !pattern.test(name)){
-    
+   
     event.preventDefault()
     errorContainer.innerHTML = "Name should not contains symbols or spaces"
     errorContainer.style.display = 'block'
   }
   
   if( startingDate > expiryDate || expiryDate < now  ) {
-   
+    
     event.preventDefault()
     errorContainer.innerHTML = "Enter a valid date"
     errorContainer.style.display = 'block'
   }
   
-  if( minimumAmount < 0 ) {
-    
-    event.preventDefault()
-    errorContainer.innerHTML = "Minimum Amount cannot be negative"
-    errorContainer.style.display = 'block'
-  }
-  
-  if( discountType === "percentage" && ( discount > 100 || discount < 0)  ) {
+  if(  percentage > 100 || percentage < 0 )   {
     
     event.preventDefault()
     errorContainer.innerHTML = "Percentage cannot be greater than 100 or less than zero"
@@ -127,6 +97,7 @@
   
   
 })
+
 function validateStartingDate() {
     const startingDateInput = document.getElementById('Starting-date');
     const validationMessage = document.getElementById('date-validation-message');
@@ -149,7 +120,7 @@ function validateStartingDate() {
     
     const selectedDate = new Date(expiryDateInput.value);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+    today.setHours(0, 0, 0, 0); // Set time to the beginning of the day
 
     if (selectedDate <= today) {
       validationMessage.textContent = 'Expiry date must be greater than today.';
@@ -160,8 +131,7 @@ function validateStartingDate() {
     }
   }
 
-
-
 </script>
+
 
 <%- include('../includes/admin/adminFooter.ejs') %>
