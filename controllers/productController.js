@@ -144,6 +144,10 @@ module.exports = {
                 req.flash('err', 'Price should not be negative');
                 return res.redirect(`/admin/edit-product/${existingProduct._id}`);
             }
+            if (req.body.quantity < 0) {
+                req.flash('err', 'Quantity should not be negative');
+                return res.redirect(`/admin/edit-product/${existingProduct._id}`);
+            }
             if (req.files) {
                 for (let file of req.files) {
                     if (

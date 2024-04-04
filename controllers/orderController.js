@@ -63,6 +63,7 @@ module.exports = {
             } else {
                 amountPayable = totalPrice
             }
+            
             const generatedID = Math.floor(100000 + Math.random() * 900000);
             let existingOrder = await orderSchema.findOne({ orderId: generatedID });
     
@@ -77,7 +78,7 @@ module.exports = {
             
             // paymentMethod === 'COD' ? orderStatus = 'Confirmed' : orderStatus = 'Pending';
             // if( amountPayable === 0) { orderStatus = 'Confirmed' }
-            if (paymentMethod === 'COD' || amountPayable === 0) {
+            if (paymentMethod === 'COD' || amountPayable ) {
                 orderStatus = 'Confirmed';
             } else if (paymentMethod === 'razorpay') {
                 orderStatus = 'Confirmed'; // Update this line to set status to 'Confirmed' for Razorpay
@@ -374,22 +375,13 @@ module.exports = {
         const overallSalesCount = orders.length;
 
         let overallOrderAmount = 0;
-        
-       
-        
+        //let overallDiscount = 0;
+        //let overallCouponDeduction = 0;
+
         for (const order of orders) {
             overallOrderAmount += order.totalPrice;
-        }
-
-        // Calculate Overall discount
-        let overallDiscount = 0;
-        for (const order of orders) {
-            overallDiscount += order.discount; // Assuming 'discount' is the correct field name in your order schema
-            
-        }
-        let overallCouponDeduction = 0;
-        for (const order of orders) {
-        overallCouponDeduction += order.couponDeduction || 0
+            //overallDiscount += order.discount || 0; // Ensure discount is always a number
+            //overallCouponDeduction += order.couponDeduction || 0; // Ensure couponDeduction is always a number
         }
         let page = Number(req.query.page);
         if (isNaN(page) || page < 1) {
@@ -446,10 +438,28 @@ module.exports = {
             sortOrder: sortOrder,
             overallSalesCount: overallSalesCount,
             overallOrderAmount: overallOrderAmount,
-            overallDiscount: overallDiscount,
-            overallCouponDeduction : overallCouponDeduction
+            //overallDiscount: overallDiscount,
+            //overallCouponDeduction : overallCouponDeduction
         });
     } catch (error) {
+        console.log(error);
+    }
+},
+invoice : async (req,res) =>{
+    try{
+        const {user} = req.session
+        const {Id} = req.params
+        const lastOrder = await orderSchema.find({_id:Id}).sort({date : -1}).limit(1).populate('address').populate('address').populate({
+            path : 'products.productId',
+            populate : {
+                path : 'brand'
+            }
+        })
+        res.render('shop/confirm-order',{
+            order:lastOrder,
+            products:lastOrder[0].products,
+        })
+    }catch(error){
         console.log(error);
     }
 }

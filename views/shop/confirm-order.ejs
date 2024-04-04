@@ -93,14 +93,16 @@
                         </thead>
                         <tbody>
                             <% for ( let product of products ){ %>
-                             <% var total = product.price * product.quantity %>
+                            <% var productPrice = product.price / product.quantity %>
+                             <% var total = productPrice * product.quantity %>
+                            
                             <tr>
                                 <td>
                                     <img width="100" src="/images/product-images/<%= product.productId.image[0] %>" alt="">
                                 </td>
                             <td><%= product.productId.name %></td>
                             <td><%= product.productId.brand.brand %></td>
-                            <td><%= product.price %></td>
+                            <td><%= productPrice %></td>
                             <td><%= product.quantity %></td>
                             <td><%= total %></td>
                             
