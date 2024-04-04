@@ -104,7 +104,8 @@
         <div class="ml-3">
 
           <button type="button" onclick="excelDownload()" id="excel-export" class="btn btn-success btn-icon-text ml-auto mb-1"> Excel <i class="mdi mdi-printer btn-icon-append"></i>
-            <button type="button" onclick="printDiv('Print')" class="btn btn-info btn-icon-text ml-1 mr-auto mb-1"> Print <i class="mdi mdi-printer btn-icon-append"></i>
+            <button type="button" onclick="generatePDF()" class="btn btn-info btn-icon-text ml-1 mr-auto mb-1">PDF <i class="mdi mdi-file-pdf-box btn-icon-append"></i>
+          <button type="button" onclick="printDiv('Print')" class="btn btn-info btn-icon-text ml-1 mr-auto mb-1"> Print <i class="mdi mdi-printer btn-icon-append"></i>
             </button>
         </div>
     </div>
@@ -210,8 +211,36 @@
   </div>
 </div>
 
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.19/jspdf.plugin.autotable.min.js"></script>
 
 <script>
+function generatePDF() {
+    const doc = new jsPDF();
+    const element = document.getElementById("Print");
+
+    // Get the table headers
+    const headers = Array.from(element.querySelectorAll("thead th")).map(th => th.innerText);
+
+    // Get the table rows
+    const rows = Array.from(element.querySelectorAll("tbody tr")).map(tr => {
+        return Array.from(tr.querySelectorAll("td")).map(td => td.innerText);
+    });
+
+    // Set initial y position for placing content
+    let y = 10;
+
+    // Create a new jsPDF table
+    doc.autoTable({
+        startY: y,
+        head: [headers],
+        body: rows
+    });
+
+    // Save the PDF
+    doc.save("sales-report.pdf");
+}
 
 
 function excelDownload() {
@@ -240,6 +269,31 @@ function excelDownload() {
     document.body.removeChild(a);
   }
 
+  function generatePDF() {
+    const doc = new jsPDF();
+    const element = document.getElementById("Print");
+
+    // Get the table headers
+    const headers = Array.from(element.querySelectorAll("thead th")).map(th => th.innerText);
+
+    // Get the table rows
+    const rows = Array.from(element.querySelectorAll("tbody tr")).map(tr => {
+        return Array.from(tr.querySelectorAll("td")).map(td => td.innerText);
+    });
+
+    // Set initial y position for placing content
+    let y = 10;
+
+    // Create a new jsPDF table
+    doc.autoTable({
+        startY: y,
+        head: [headers],
+        body: rows
+    });
+
+    // Save the PDF
+    doc.save("sales-report.pdf");
+}
 
  
 

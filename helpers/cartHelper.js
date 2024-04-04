@@ -15,26 +15,26 @@ async function calculateOrderedQuantity(productId) {
         return 0; // Return 0 in case of an error
     }
 }
-async function calculateTotalDiscountAmount() {
-    try {
-        const orders = await orderSchema.find({}); // Fetch all orders
-        let totalDiscountAmount = 0;
+// async function calculateTotalDiscountAmount() {
+//     try {
+//         const orders = await orderSchema.find({}); // Fetch all orders
+//         let totalDiscountAmount = 0;
 
-        // Iterate through each order and sum up the discounted amount
-        orders.forEach(order => {
-            totalDiscountAmount += order.discount;
-        });
+//         // Iterate through each order and sum up the discounted amount
+//         orders.forEach(order => {
+//             totalDiscountAmount += order.discount;
+//         });
 
-        console.log('Total overall discount amount:', totalDiscountAmount);
-        return totalDiscountAmount;
-    } catch (error) {
-        console.error('Error calculating total discount amount:', error);
-        throw error;
-    }
-}
+//         console.log('Total overall discount amount:', totalDiscountAmount);
+//         return totalDiscountAmount;
+//     } catch (error) {
+//         console.error('Error calculating total discount amount:', error);
+//         throw error;
+//     }
+// }
 
-// Call the function to calculate the total overall discount amount
-calculateTotalDiscountAmount();
+// // Call the function to calculate the total overall discount amount
+// calculateTotalDiscountAmount();
 module.exports = {
     updateQuantity: async (user) => {
         try {

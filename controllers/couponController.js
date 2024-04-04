@@ -79,6 +79,18 @@ module.exports={
     editCoupon: async (req, res) => {
         try {
             const { name, description, startingDate, expiryDate, minimumAmount, discountType, discount, id } = req.body;
+            const updatedName = name.toUpperCase();
+
+            // Check if the provided coupon name already exists
+            const existingCoupon = await couponSchema.findOne({ name: updatedName });
+    
+            // If the same coupon name exists and it's not the current coupon being edited
+            if (existingCoupon && existingCoupon._id.toString() !== id) {
+                req.flash('err', 'Coupon name must be unique');
+                return res.redirect('/admin/coupons');
+            }
+    
+            
             await couponSchema.updateOne({ _id: id }, {
                 $set: {
                     name: name.toUpperCase(),

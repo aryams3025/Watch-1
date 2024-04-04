@@ -38,4 +38,6 @@ router.get('/cancelCoupon',isAuth.userAuth,couponController.cancelCouponuser)
 //router.get('/availabile-coupons',isAuth.userAuth,couponController.getAvailabileCoupons)
 
 
+router.get('/invoice/:id',isAuth.userAuth,isBlocked.isBlocked,orderController.invoice)
+
 module.exports = router;

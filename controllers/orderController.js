@@ -63,6 +63,7 @@ module.exports = {
             } else {
                 amountPayable = totalPrice
             }
+            
             const generatedID = Math.floor(100000 + Math.random() * 900000);
             let existingOrder = await orderSchema.findOne({ orderId: generatedID });
     
@@ -77,7 +78,7 @@ module.exports = {
             
             // paymentMethod === 'COD' ? orderStatus = 'Confirmed' : orderStatus = 'Pending';
             // if( amountPayable === 0) { orderStatus = 'Confirmed' }
-            if (paymentMethod === 'COD' || amountPayable === 0) {
+            if (paymentMethod === 'COD' || amountPayable ) {
                 orderStatus = 'Confirmed';
             } else if (paymentMethod === 'razorpay') {
                 orderStatus = 'Confirmed'; // Update this line to set status to 'Confirmed' for Razorpay
@@ -441,6 +442,24 @@ module.exports = {
             //overallCouponDeduction : overallCouponDeduction
         });
     } catch (error) {
+        console.log(error);
+    }
+},
+invoice : async (req,res) =>{
+    try{
+        const {user} = req.session
+        const {Id} = req.params
+        const lastOrder = await orderSchema.find({_id:Id}).sort({date : -1}).limit(1).populate('address').populate('address').populate({
+            path : 'products.productId',
+            populate : {
+                path : 'brand'
+            }
+        })
+        res.render('shop/confirm-order',{
+            order:lastOrder,
+            products:lastOrder[0].products,
+        })
+    }catch(error){
         console.log(error);
     }
 }
