@@ -368,83 +368,83 @@ module.exports = {
             console.log(error);
         }
     },
-    getSalesReport: async (req, res) => {
-    try {
-        const { from, to, seeAll, sortData, sortOrder } = req.query;
-        const orders = await orderSchema.find();
-        const overallSalesCount = orders.length;
+//     getSalesReport: async (req, res) => {
+//     try {
+//         const { from, to, seeAll, sortData, sortOrder } = req.query;
+//         const orders = await orderSchema.find();
+//         const overallSalesCount = orders.length;
 
-        let overallOrderAmount = 0;
-        //let overallDiscount = 0;
-        //let overallCouponDeduction = 0;
+//         let overallOrderAmount = 0;
+//         //let overallDiscount = 0;
+//         //let overallCouponDeduction = 0;
 
-        for (const order of orders) {
-            overallOrderAmount += order.totalPrice;
-            //overallDiscount += order.discount || 0; // Ensure discount is always a number
-            //overallCouponDeduction += order.couponDeduction || 0; // Ensure couponDeduction is always a number
-        }
-        let page = Number(req.query.page);
-        if (isNaN(page) || page < 1) {
-            page = 1;
-        }
-        const conditions = {};
-        if (from && to) {
-            conditions.date = {
-                $gte: from,
-                $lte: to
-            };
-        } else if (from) {
-            conditions.date = {
-                $gte: from
-            };
-        } else if (to) {
-            conditions.date = {
-                $lte: to
-            };
-        }
+//         for (const order of orders) {
+//             overallOrderAmount += order.totalPrice;
+//             //overallDiscount += order.discount || 0; // Ensure discount is always a number
+//             //overallCouponDeduction += order.couponDeduction || 0; // Ensure couponDeduction is always a number
+//         }
+//         let page = Number(req.query.page);
+//         if (isNaN(page) || page < 1) {
+//             page = 1;
+//         }
+//         const conditions = {};
+//         if (from && to) {
+//             conditions.date = {
+//                 $gte: from,
+//                 $lte: to
+//             };
+//         } else if (from) {
+//             conditions.date = {
+//                 $gte: from
+//             };
+//         } else if (to) {
+//             conditions.date = {
+//                 $lte: to
+//             };
+//         }
 
-        const sort = {};
-        if (sortData) {
-            if (sortOrder === "Ascending") {
-                sort[sortData] = sortData === "totalPrice" ? 1 : sortOrder;
+//         const sort = {};
+//         if (sortData) {
+//             if (sortOrder === "Ascending") {
+//                 sort[sortData] = sortData === "totalPrice" ? 1 : sortOrder;
 
-            } else if (sortOrder === "Descending") {
-                sort[sortData] = -1;
-            }
-        } else {
-            sort['date'] = sortOrder === "Ascending" ? 1 : -1;
-        }
+//             } else if (sortOrder === "Descending") {
+//                 sort[sortData] = -1;
+//             }
+//         } else {
+//             sort['date'] = sortOrder === "Ascending" ? 1 : -1;
+//         }
 
-        const orderCount = await orderSchema.countDocuments();
-        const limit = seeAll === "seeAll" ? orderCount : paginationHelper.SALES_PER_PAGE;
-        const filteredOrders = await orderSchema.find(conditions)
-            .sort(sort)
-            .skip((page - 1) * paginationHelper.ORDER_PER_PAGE.limit)
-            .limit(limit);
+//         const orderCount = await orderSchema.countDocuments();
+//         const limit = seeAll === "seeAll" ? orderCount : paginationHelper.SALES_PER_PAGE;
+//         const filteredOrders = await orderSchema.find(conditions)
+//             .sort(sort)
+//             .skip((page - 1) * paginationHelper.ORDER_PER_PAGE.limit)
+//             .limit(limit);
 
-        res.render('admin/sales-report', {
-            admin: true,
-            orders: filteredOrders,
-            from: from,
-            to: to,
-            seeAll: seeAll,
-            currentPage: page,
-            hasNextPage: page * paginationHelper.SALES_PER_PAGE < orderCount,
-            hasPrevPage: page > 1,
-            nextPage: page + 1,
-            prevPage: page - 1,
-            lastPage: Math.ceil(orderCount / paginationHelper.SALES_PER_PAGE),
-            sortData: sortData,
-            sortOrder: sortOrder,
-            overallSalesCount: overallSalesCount,
-            overallOrderAmount: overallOrderAmount,
-            //overallDiscount: overallDiscount,
-            //overallCouponDeduction : overallCouponDeduction
-        });
-    } catch (error) {
-        console.log(error);
-    }
-},
+//         res.render('admin/sales-report', {
+//             admin: true,
+//             orders: filteredOrders,
+//             from: from,
+//             to: to,
+//             seeAll: seeAll,
+//             currentPage: page,
+//             hasNextPage: page * paginationHelper.SALES_PER_PAGE < orderCount,
+//             hasPrevPage: page > 1,
+//             nextPage: page + 1,
+//             prevPage: page - 1,
+//             lastPage: Math.ceil(orderCount / paginationHelper.SALES_PER_PAGE),
+//             sortData: sortData,
+//             sortOrder: sortOrder,
+//             overallSalesCount: overallSalesCount,
+//             overallOrderAmount: overallOrderAmount,
+//             //overallDiscount: overallDiscount,
+//             //overallCouponDeduction : overallCouponDeduction
+//         });
+//     } catch (error) {
+//         console.log(error);
+//     }
+// },
 invoice : async (req,res) =>{
     try{
         const {user} = req.session
@@ -462,5 +462,134 @@ invoice : async (req,res) =>{
     }catch(error){
         console.log(error);
     }
+},
+getSalesReport: async (req, res) => {
+    try {
+        const { from, to, period, sortData, sortOrder } = req.query;
+        const orders = await orderSchema.find();
+        const overallSalesCount = orders.length;
+        let overallOrderAmount = 0;
+        
+        for (const order of orders) {
+            overallOrderAmount += order.totalPrice;
+        }
+
+        let page = Number(req.query.page);
+        if (isNaN(page) || page < 1) {
+            page = 1;
+        }
+
+        const conditions = {};
+
+        if (from && to) {
+            conditions.date = {
+                $gte: from,
+                $lte: to
+            };
+        } else if (from) {
+            conditions.date = {
+                $gte: from
+            };
+        } else if (to) {
+            conditions.date = {
+                $lte: to
+            };
+        }
+
+        if (period) {
+            const currentDate = new Date();
+            let startDate, endDate;
+
+            switch (period) {
+                case 'daily':
+                    startDate = new Date(currentDate);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(currentDate);
+                    endDate.setHours(23, 59, 59, 999);
+                    conditions.date = {
+                        $gte: startDate,
+                        $lte: endDate
+                    };
+                    break;
+                case 'weekly':
+                    // Calculate start and end of the week
+                    // Adjust conditions accordingly
+                    startDate = new Date(currentDate);
+                    startDate.setDate(currentDate.getDate() - currentDate.getDay());
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(currentDate);
+                    endDate.setDate(currentDate.getDate() + (6 - currentDate.getDay()));
+                    endDate.setHours(23, 59, 59, 999);
+                    conditions.date = {
+                        $gte: startDate,
+                        $lte: endDate
+                    };
+                    break;
+                case 'monthly':
+                    startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                    endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate.setHours(23, 59, 59, 999);
+                    conditions.date = {
+                        $gte: startDate,
+                        $lte: endDate
+                    };
+                    break;
+                case 'yearly':
+                    startDate = new Date(currentDate.getFullYear(), 0, 1);
+                    endDate = new Date(currentDate.getFullYear(), 11, 31);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate.setHours(23, 59, 59, 999);
+                    conditions.date = {
+                        $gte: startDate,
+                        $lte: endDate
+                    };
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        const sort = {};
+        if (sortData) {
+            if (sortOrder === "Ascending") {
+                sort[sortData] = sortData === "totalPrice" ? 1 : 1; // Set to 1 for ascending
+            } else if (sortOrder === "Descending") {
+                sort[sortData] = -1; // Set to -1 for descending
+            }
+        } else {
+            sort['date'] = sortOrder === "Ascending" ? 1 : -1;
+        }
+        
+
+
+        const orderCount = await orderSchema.countDocuments();
+        const limit = req.query.seeAll === "seeAll" ? orderCount : paginationHelper.SALES_PER_PAGE;
+        const filteredOrders = await orderSchema.find(conditions)
+            .sort(sort)
+            .skip((page - 1) * paginationHelper.ORDER_PER_PAGE.limit)
+            .limit(limit);
+
+        res.render('admin/sales-report', {
+            admin: true,
+            orders: filteredOrders,
+            from: from,
+            to: to,
+            period: period,
+            currentPage: page,
+            hasNextPage: page * paginationHelper.SALES_PER_PAGE < orderCount,
+            hasPrevPage: page > 1,
+            nextPage: page + 1,
+            prevPage: page - 1,
+            lastPage: Math.ceil(orderCount / paginationHelper.SALES_PER_PAGE),
+            sortData: sortData,
+            sortOrder: sortOrder,
+            overallSalesCount: overallSalesCount,
+            overallOrderAmount: overallOrderAmount
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
+
 }
