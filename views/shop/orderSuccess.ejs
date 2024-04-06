@@ -1,0 +1,49 @@
+<%- include('../includes/userHead.ejs') %>
+<%- include('../includes/userNavbar.ejs') %>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 text-center mt-5">
+            <h1>Order Placed Successfully!</h1>
+            <p>Your order has been successfully placed.</p>
+            <!-- Add any additional details or links as needed -->
+            <a href="/">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+
+<%- include('../includes/userFooter.ejs') %>
+<%- include('../includes/end.ejs') %>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    // JavaScript code should be enclosed within <script> tags
+    // Define success function
+    function success(order) {
+        if (order.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Order Placed!',
+                text: 'Your order has been successfully placed.',
+            }).then(() => {
+                // Redirect to the order success page
+                location.href = '/order-success';
+            });
+        } else if (order.outofStock) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Order is not Placed',
+                text: 'Out of stock.',
+            }).then(() => {
+                location.href = '/cart';
+            });
+        } else {
+            razorpayPayment(order.payment);
+        }
+    }
+
+    // Call the success function when needed, probably after an AJAX request
+    // For example:
+    // success({success: true});
+</script>

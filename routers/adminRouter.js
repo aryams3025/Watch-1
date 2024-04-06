@@ -15,7 +15,7 @@ const orderController = require('../controllers/orderController.js')
 const offerController = require('../controllers/offerController.js')
 
 //admin logout and user management
-
+router.get('/',isAuth.adminAuth,adminController.getAdminHome)
 router.get( '/logout', isAuth.adminAuth,authController.doAdminLogout )
 router.get('/user-list',isAuth.adminAuth,adminController.usersList)
 router.patch('/block-user/:id',isAuth.adminAuth,adminController.blockUser)
@@ -88,5 +88,7 @@ router.patch( '/remove-category-offer', isAuth.adminAuth, categoryController.rem
 //get sales report 
 
 router.get('/sales-report',isAuth.adminAuth,orderController.getSalesReport)
+
+//router.post('/filterchart',isAuth.adminAuth,adminController.filterchart)
 
 module.exports = router

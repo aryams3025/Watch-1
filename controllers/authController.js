@@ -7,115 +7,114 @@ const { longFormatters } = require('date-fns');
 
 
 module.exports={
-        getHome:async(req,res)=>{
-            try{
-                res.render('shop/home')
-            }catch(error){
-                console.log(error)
-            }
-    },
-    getUserLogin:async(req,res)=>{
+    getHome:async(req,res)=>{
         try{
-            res.render('auth/userLogin')
+            res.render('shop/home')
         }catch(error){
             console.log(error)
         }
-    },
-   
-    userLogin: async(req,res)=>{
-        try{
-            
-            userData=await userSchema.findOne({email:req.body.email})
-            if(userData && userData.isAdmin!==1){
-                if(userData.isBlocked === false){
-                    const password=await bcrypt.compare(req.body.password,userData.password)
-                    if(password){
-                        if(userData.isVerified){
-                    
-                            req.session.user=userData._id
-                            res.redirect('/landing')
-                        }else{
-                            const newOtp = verificationController.sendEmail(req.body.email, req.body.lastName)
-                            await userSchema.updateOne({email : req.body.email},{
-                                $set :{ 'token.otp' : newOtp , 'token.generatedTime' : new Date()}
-                            })
-                            req.session.unVerfiedMail = req.body.email
-                            res.redirect( '/otp-verification')
-                        }
+},
+getUserLogin:async(req,res)=>{
+    try{
+        res.render('auth/userLogin')
+    }catch(error){
+        console.log(error)
+    }
+},
+
+userLogin: async(req,res)=>{
+    try{
+        
+        userData=await userSchema.findOne({email:req.body.email})
+        if(userData && userData.isAdmin!==1){
+            if(userData.isBlocked === false){
+                const password=await bcrypt.compare(req.body.password,userData.password)
+                if(password){
+                    if(userData.isVerified){
+                
+                        req.session.user=userData._id
+                        res.redirect('/landing')
                     }else{
-                        req.flash('err','Incorrect password')
-                        res.redirect('/login')
+                        const newOtp = verificationController.sendEmail(req.body.email, req.body.lastName)
+                        await userSchema.updateOne({email : req.body.email},{
+                            $set :{ 'token.otp' : newOtp , 'token.generatedTime' : new Date()}
+                        })
+                        req.session.unVerfiedMail = req.body.email
+                        res.redirect( '/otp-verification')
                     }
                 }else{
-                    const password=await bcrypt.compare(req.body.password,userData.password)
-                    if(password){
-                        //if user is blocked
-                        req.flash('err','blocked user')
-                        res.send("User Blocked")
-                        res.redirect('/login')
-                    }else{
-                        //For incorrect password
-                        req.flash('err','incorrect Password')
-                        res.redirect('/login')
-                    }
+                    req.flash('err','Incorrect password')
+                    res.redirect('/login')
                 }
             }else{
-                //incorrect Username
-                req.flash('err','Incorrect email')
-                res.redirect('/login')
+                const password=await bcrypt.compare(req.body.password,userData.password)
+                if(password){
+                    //if user is blocked
+                    req.flash('err','blocked user')
+                    res.send("User Blocked")
+                    res.redirect('/login')
+                }else{
+                    //For incorrect password
+                    req.flash('err','incorrect Password')
+                    res.redirect('/login')
+                }
             }
-        }catch(err){
-           
-            console.log(err)
-        
+        }else{
+            //incorrect Username
+            req.flash('err','Incorrect email')
+            res.redirect('/login')
         }
-    },
+    }catch(err){
+       
+        console.log(err)
     
-    
-    usersignUp : async(req,res)=>{
-        try{
-            res.render('auth/userSignup')
-        }catch(error){
-            console.log(error);
+    }
+},
+
+
+usersignUp : async(req,res)=>{
+    try{
+        res.render('auth/userSignup')
+    }catch(error){
+        console.log(error);
+    }
+},
+postuserSignup :  async(req,res)=>{
+    try{
+
+        //checking if there any existing user in the site
+        const userData = await userSchema.findOne({email:req.body.email})
+
+
+        //if user exist
+        if(userData){
+            req.flash('userExist',"User Already Exist..............")
+            res.redirect('/signup')
         }
-    },
-    postuserSignup :  async(req,res)=>{
-        try{
+        else{
+            const otp = verificationController.sendMail(req.body.email)
+            const password = await bcrypt.hash(req.body.password,12)
 
-            //checking if there any existing user in the site
-            const userData = await userSchema.findOne({email:req.body.email})
-
-
-            //if user exist
-            if(userData){
-                req.flash('userExist',"User Already Exist..............")
-                res.redirect('/signup')
-            }
-            else{
-                const otp = verificationController.sendMail(req.body.email)
-                const password = await bcrypt.hash(req.body.password,12)
-
-                const user = new userSchema({
-                    firstName : req.body.firstName,
-                    lastName : req.body.lastName,
-                    email : req.body.email,
-                    isAdmin: 0,
-                    mobile : req.body.mobile,
-                    password : password,
-                    token :{
-                        otp : otp,
-                        generatedTime : new Date()
-                    }
-                })
-                    await user.save()
-                    req.session.unVerifiedMail=req.body.email
-                    res.redirect('/otp-verification')
-            }
-        }catch(error){
-            console.log(error);
+            const user = new userSchema({
+                firstName : req.body.firstName,
+                lastName : req.body.lastName,
+                email : req.body.email,
+                isAdmin: 0,
+                mobile : req.body.mobile,
+                password : password,
+                token :{
+                    otp : otp,
+                    generatedTime : new Date()
+                }
+            })
+                await user.save()
+                req.session.unVerifiedMail=req.body.email
+                res.redirect('/otp-verification')
         }
-    },
-
+    }catch(error){
+        console.log(error);
+    }
+},
     // otp verification page
     getotpVerification :(req,res)=>{
         res.render('auth/signup-otp')

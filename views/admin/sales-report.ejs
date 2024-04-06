@@ -40,7 +40,7 @@
 
 <div class="main-panel">
     <div class="content-wrapper">
-      <% if ( seeAll ) { %>
+      <% if ( typeof seeAll !== 'undefined' && seeAll ) { %>
         <div><a class="badge badge-outline-primary" href="/admin/sales-report">Show less</a></div>
         <% } else { %>
           <div><a class="badge badge-outline-primary" href="/admin/sales-report?seeAll=seeAll">Show all</a></div>
@@ -57,11 +57,11 @@
                 <div class="col-sm-12">
                   <form action="/admin/sales-report">
                   <select class="form-control" name="sortData">
-                    <option value="date" >Date</option>
-                    <option value="totalPrice" >Amount</option>
-                    <option value="totalPrice">Weekly</option>
-                    <option value="totalPrice">Monthly</option>
-                    <option value="totalPrice">Yearly</option>
+                    <option value="">All Periods</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
                   </select>
                 </div>
               </div>
@@ -88,7 +88,7 @@
         </div>
 
         <div class="row">
-        <form class="col-12" action="/admin/sales-report<% if(seeAll){ %>?seeAll=seeAll<% } %>" id="sales-report-form">
+        <form class="col-12" action="/admin/sales-report<% if(typeof seeAll !== 'undefined' && seeAll){ %>?seeAll=seeAll<% } %>" id="sales-report-form">
           <div class="col-12 col-sm-6">
 
             <label for="birthday">From :</label>
@@ -167,7 +167,7 @@
 
       <!-- Pagination buttons -->
      <!-- Pagination -->
-<% if( !seeAll ) { %>
+<% if( !(typeof seeAll !== 'undefined' && seeAll)) { %>
   <div class="pagination-btn">
       <!-- First page button -->
       <% if( currentPage !== 1 ) { %> 

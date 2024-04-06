@@ -37,7 +37,7 @@ router.post('/apply-coupon',isAuth.userAuth,couponController.applyCoupn)
 router.get('/cancelCoupon',isAuth.userAuth,couponController.cancelCouponuser)
 //router.get('/availabile-coupons',isAuth.userAuth,couponController.getAvailabileCoupons)
 
-
+router.get('/order-success',isAuth.userAuth,isBlocked.isBlocked,orderController.orderSuccess)
 router.get('/invoice/:id',isAuth.userAuth,isBlocked.isBlocked,orderController.invoice)
 
 module.exports = router;

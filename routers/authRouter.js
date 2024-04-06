@@ -5,6 +5,7 @@ const router=express.Router()
 const authController=require('../controllers/authController.js')
 const isAuth=require('../middleware/isAuth')
 
+
 router.get('/',authController.getUserLogin)
 router.get('/landing',authController.getHome)
 
@@ -17,6 +18,8 @@ router.get('/usersignup',authController.usersignUp)
 router.get('/logout',isAuth.userAuth,authController.doUserLogout)
 
 router.post('/signup',authController.postuserSignup)
+
+
 router.get('/otp-verification',authController.getotpVerification)
 router.post('/otp-verification',authController.signupVerification)
 router.get('/resend-otp',authController.resendOtp)

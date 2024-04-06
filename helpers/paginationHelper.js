@@ -1,8 +1,8 @@
 const USERS_PER_PAGE=5
-const PRODUCT_PER_PAGE = 4
-const CATEGORY_PER_PAGE = 4
-const ITEMS_PER_PAGE = 3
-const BRAND_PER_PAGE=6
+const PRODUCT_PER_PAGE = 5
+const CATEGORY_PER_PAGE = 10
+const ITEMS_PER_PAGE = 6
+const BRAND_PER_PAGE=10
 const ORDER_PER_PAGE = 8
 const SALES_PER_PAGE = 10
 module.exports = {
