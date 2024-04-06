@@ -3,6 +3,84 @@ const paginationHelper=require('../helpers/paginationHelper')
 const { contains } = require('jquery')
 
 module.exports = {
+    getAdminHome:async(req,res)=>{
+        try{
+            const startDate = req.query.startDate ? new Date(req.query.startDate) : new Date() - 14 * 24 * 60 * 60 * 1000;
+            
+            
+            const endDate=req.query.endDate || new Date()
+            const today=new Date();
+            today.setHours(0,0,0,0)
+            const yesterday=new Date(today)
+            yesterday.setDate(today.getDate()-1)
+            const now =new Date();
+            const currentYear = new Date().getFullYear();
+            const currentMonth=now.getMonth();
+            const currentMonthStartDate=new Date(currentYear,currentMonth,1,0,0,0)
+            const previousMonthStartDate=new Date(currentYear,currentMonth-1,1,0,0,0)
+            const previousMonthEndDate=new Date(currentYear,currentMonth,0,23,59,59)
+            const promises=[
+                productSchema.find({status:true}).count(),
+                userSchema.find({isBlocked:false,isVerified:true,isAdmin:0}).count(),
+                dashboardHelper.currentMonthRevenue(currentMonthStartDate,now),
+                dashboardHelper.previousMonthRevenue(previousMonthStartDate,previousMonthEndDate),
+                dashboardHelper.paymentMethodAmount(),
+                dashboardHelper.todayIncome(today,now),
+                dashboardHelper.yesterdayIncome(today,yesterday),
+                dashboardHelper.totalRevenue(),
+                orderSchema.find({ orderStatus : "Confirmed" }).count(),
+                orderSchema.find({ orderStatus : "Delivered" }).count(),
+                dashboardHelper.dailyChart(startDate,endDate),
+                dashboardHelper.categorySales()
+                
+            ]
+            const results=await Promise.all(promises)
+            const productCount=results[0]
+            const userCount=results[1]
+            const revenueCurrentMonth=results[2]
+            const revenuePreviousMonth=results[3]
+            const paymentMethodAmount=results[4]
+            const todayIncome=results[5]
+            const yesterdayIncome=results[6]
+            const  totalRevenue=results[7]
+            const ordersToShip=results[8]
+            const completedOrders=results[9]
+            const dailyChart=results[10]
+            const categorySales=results[11]
+            
+            
+            const razorPayAmount=paymentMethodAmount && paymentMethodAmount.length>0?paymentMethodAmount[0].amount.toString():0
+            const codPayAmount=paymentMethodAmount && paymentMethodAmount.length>0?paymentMethodAmount[1].amount.toString():0
+            
+            const monthlyGrowth=revenuePreviousMonth===0?100:(((revenueCurrentMonth-revenuePreviousMonth)/revenuePreviousMonth)*100).toFixed(1);
+            const dailyGrowth = ((( todayIncome - yesterdayIncome ) / yesterdayIncome ) * 100).toFixed( 1 )  
+            
+            
+
+            res.render('admin/dashboard',{
+                admin : req.session.admin,
+                todayIncome : todayIncome,
+                dailyGrowth : dailyGrowth,
+                totalRevenue : totalRevenue,
+                revenueCurrentMonth : revenueCurrentMonth,
+                monthlyGrowth : monthlyGrowth,
+                razorPayAmount : razorPayAmount,
+                codPayAmount : codPayAmount,
+                userCount : userCount,
+                ordersToShip : ordersToShip,
+                completedOrders : completedOrders,
+                productCount : productCount,
+                dailyChart : dailyChart,
+                categorySales : categorySales,
+                startDate:startDate,
+                endDate:endDate,
+
+            })
+        }catch(error){
+            res.redirect('/500')
+        }
+    },
+
     usersList : async(req,res)=>{
         try {
             const { search, sortData, sortOrder } = req.query;

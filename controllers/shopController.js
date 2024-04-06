@@ -10,7 +10,7 @@ const cartHelper = require('../helpers/cartHelper')
 const couponHelper = require('../helpers/couponHelper')
 
 module.exports = {
-
+  
    
     getShop: async (req, res) => {
         try {
@@ -78,7 +78,7 @@ module.exports = {
                     path: "brand",
                     match: { status: true }
                 })
-                .sort({createdAt:-1}).limit(3)
+                .sort({createdAt:1}).skip(Math.max(0, productCount - 3))
     
             const filteredProducts = products.filter(product => product.category && product.brand);
             const newfilteredProducts = newproducts.filter(product => product.category && product.brand);  // Pagination

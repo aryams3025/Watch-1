@@ -14,6 +14,14 @@
           </div>
           <h3>Create an account</h3>
           <form class="row login_form" method="POST" action="/signup" id="register_form">
+
+            <% if( err.length > 0) { %>
+            <div class="col-md-12 form-group" id="flash-div">
+              <label   
+              style="border: 1px solid rgb(196, 0, 0); padding: 15px 0; width: 100%; background-color: rgb(255, 172, 172); color: rgb(196, 0, 0);" 
+              for=""><%= err %></label>
+            </div>
+            <% } %>
             
             <div class="col-md-12 form-group">
               <input
@@ -107,14 +115,6 @@
                 Register
               </button>
             </div>
-            <div class="col-md-12 form-group">
-              <button id ="google-auth-button"
-                type="google authentication"
-                value="google authentication"
-                class="google-auth-button w-100">
-                Google Authentication
-              </button>
-            </div>
           </form>
           <p>Already have an account? <a href="/login">Login</a></p>
           <br><br>
@@ -146,7 +146,6 @@
       var lastName = document.getElementById('lastName').value.trim();
       var email = document.getElementById('email').value.trim();
       var mobile = document.getElementById('mobile').value.trim();
-      
       var password = document.getElementById('password').value;
       var confirmPassword = document.getElementById('confirmPassword').value;
       var referral = document.getElementById('referral').value;
@@ -214,8 +213,7 @@
             hasError = true;
           } else {
             // Regular expression for mobile number validation
-            // var mobileRegex = /^\d{10}$/;
-            var mobileRegex = /^[1-9]\d{9}$/;
+            var mobileRegex = /^\d{10}$/;
   
             if (!mobileRegex.test(mobile)) {
               // Mobile number is invalid, display an error message
@@ -226,7 +224,7 @@
                   style="border: 1px solid rgb(196, 0, 0); padding: 15px 0; width: 100%; background-color: rgb(255, 172, 172); color: rgb(196, 0, 0);"
                   for="mobile"
                 >
-                  Please enter valid phone number between 1-9
+                  Mobile number should be 10 digits
                 </label>
               `;
               var form = document.querySelector('#register_form');
@@ -284,12 +282,7 @@
   
   
   
-  <script>
-    document.getElementById('google-auth-button').addEventListener('click', function() {
-        // Redirect user to Google authentication page
-        window.location.href = '/auth/google';
-    });
-  </script>
+  
   
   
 

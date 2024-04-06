@@ -143,7 +143,14 @@ async function submitForm() {
                         }).then(() => {
                             location.href = '/cart';
                         });
-                    } 
+                    }  else if (!order.success && order.message) {
+                        // Handle message if COD is not available for order above Rs 1000
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: order.message,
+                        });
+}
                     else {
                         razorpayPayment(order.payment);
                     }
