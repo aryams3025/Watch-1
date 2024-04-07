@@ -83,7 +83,8 @@ module.exports = {
                     { description: { $regex: search, $options: 'i' } },
                 ];
             }
-            const availabileOffers = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }})
+            const availabileOffers = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }});
+            //const availabileOffers = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }})
             const productsCount = await productSchema.find(condition).count();
             const productCount = await productSchema.find(condition).countDocuments();
             //const products = await productSchema.find(condition)
@@ -111,7 +112,8 @@ module.exports = {
                 search: search,
                 sortData: sortData,
                 sortOrder: sortOrder,
-                availabileOffers  : availabileOffers
+                availabileOffers: availabileOffers
+                //availabileOffers  : availabileOffers
             });
         } catch (error) {
             console.log(error);

@@ -56,16 +56,28 @@ module.exports = {
 
             
     
-            const productCount = await productSchema.find(condition).countDocuments();
-            const products = await productSchema.find(condition)
-                .populate({
-                    path: "category",
-                    match: { status: true }
-                })
-                .populate({
-                    path: "brand",
-                    match: { status: true }
-                })
+            // const productCount = await productSchema.find(condition).countDocuments();
+            // const products = await productSchema.find(condition)
+            //     .populate({
+            //         path: "category",
+            //         match: { status: true }
+            //     })
+            //     .populate({
+            //         path: "brand",
+            //         match: { status: true }
+            //     })
+            const productCount=await productSchema.find(condition).count()
+            const products=await productSchema.find(condition).populate({
+                path : 'offer',
+                match :  { startingDate : { $lte : new Date() }, expiryDate : { $gte : new Date() }}
+            })
+            .populate({
+                path : 'category',
+                populate : {
+                    path : 'offer',
+                    match : { startingDate : { $lte : new Date() }, expiryDate : { $gte : new Date() }}
+                }
+            })
                 .sort(sortCondition) // Apply sorting
                 .skip((page - 1) * paginationHelper.ITEMS_PER_PAGE)
                 .limit(paginationHelper.ITEMS_PER_PAGE);

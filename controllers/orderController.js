@@ -12,127 +12,7 @@ const paymentHelper = require('../helpers/paymentHelper')
 const { log } = require('console')
 
 module.exports = {
-    // placeOrder : async ( req, res ) => {
-    //     try {
-    //         const { user } = req.session
-    //         const products =  await cartHelper.totalCartPrice( user )
-    //         const { paymentMethod, addressId, walletAmount } = req.body
-    //         const productCount = await cartHelper.updateQuantity( user )
-    //         if( productCount){
-    //             //If product is not available when we are at checkout
-    //             req.session.productCount-=productCount
-    //         res.json({outofStock:true})
-    //         }else{
-    //         let walletBalance
-    //         if( walletAmount ){
-    //             walletBalance = Number( walletAmount )
-    //         }
-    //         const productItems = products[0].items
-    //         //Inserting individual product details
-    //         const cartProducts = productItems.map( ( items ) => ({
-    //             productId : items.productId,
-    //             quantity : items.quantity,
-    //             price : ( items.totalPrice )
-    //         }))
-    //         const cart = await cartSchema.findOne({ userId : user })
-    //         const totalAmount = await cartHelper.totalCartPrice( user )
-    //         let  discounted={}
-    //         if( cart && cart.coupon && totalAmount && totalAmount.length > 0 ) {
-    //             discounted = await couponHelper.discountPrice( cart.coupon, totalAmount[0].total )
-    //             await couponSchema.updateOne({ _id : cart.coupon},{
-    //                 $push : {
-    //                     users : user
-    //                 }
-    //             })
-    //         }
-    //         let discountAmount=0
-    //         if(discounted.discountAmount>0){
-    //             console.log('hai');
-    //          discountAmount=discounted.discountAmount
-    //         }
-    //         const totalPrice = discounted && discounted.discountedTotal ? discounted.discountedTotal : totalAmount[0].total
-    //         let walletUsed, amountPayable
-    //         if( walletAmount ) {
-    //             if( totalPrice > walletBalance ) {
-    //                 amountPayable = totalPrice - walletBalance
-    //                 walletUsed = walletBalance
-    //             } else if( walletBalance > totalPrice ) {
-    //                 amountPayable = 0
-    //                 walletUsed = totalPrice
-    //             }
-    //         } else {
-    //             amountPayable = totalPrice
-    //         }
-            
-    //         const generatedID = Math.floor(100000 + Math.random() * 900000);
-    //         let existingOrder = await orderSchema.findOne({ orderId: generatedID });
     
-    //         // Loop until a unique order ID is generated
-    //         while (existingOrder) {
-    //             generatedID = Math.floor(100000 + Math.random() * 900000);
-    //             existingOrder = orderSchema.findOne({ orderId: generatedID });
-    //         }
-    
-    //         // Use the generated unique orderId for the new order
-    //         const orderId = `ORD${generatedID}`;
-            
-    //         // paymentMethod === 'COD' ? orderStatus = 'Confirmed' : orderStatus = 'Pending';
-    //         // if( amountPayable === 0) { orderStatus = 'Confirmed' }
-    //         if (paymentMethod === 'COD' || amountPayable ) {
-    //             orderStatus = 'Confirmed';
-    //         } else if (paymentMethod === 'razorpay') {
-    //             orderStatus = 'Confirmed'; // Update this line to set status to 'Confirmed' for Razorpay
-    //         }
-    //         const order = new orderSchema({
-    //             userId : user,
-    //             orderId:orderId,
-    //             products : cartProducts,
-    //             totalPrice : totalPrice,
-    //             paymentMethod : paymentMethod,
-    //             orderStatus : orderStatus,
-    //             address : addressId,
-    //             walletUsed : walletUsed,
-    //             amountPayable : amountPayable,
-    //             discounted:discountAmount
-    //         })
-    //         const ordered= await order.save()
-    //         // Decreasing quantity
-    //         for( const items of cartProducts ){
-    //             const { productId, quantity } = items
-    //             await productSchema.updateOne({_id : productId},
-    //                 { $inc : { quantity :  -quantity  }})
-    //             } 
-    //         // Deleting cart
-    //         await cartSchema.deleteOne({ userId : user })
-    //         req.session.productCount = 0
-    //         if(  paymentMethod === 'COD' || amountPayable === 0 ){
-    //             // COD
-    //                 if( walletAmount ) {
-    //                     await userSchema.updateOne({ _id : user }, {
-    //                         $inc : {
-    //                             wallet : -walletUsed
-    //                         },
-    //                         $push : {
-    //                             walletHistory : {
-    //                                 date : Date.now(),
-    //                                 amount : -walletUsed,
-    //                                 message : 'Used for purachse'
-    //                             }
-    //                         }
-    //                     })
-    //                 }
-    //                 return res.json({ success : true})
-    //         }
-    //          else if( paymentMethod === 'razorpay'){
-    //             // Razorpay 
-    //             const payment = await paymentHelper.razorpayPayment( ordered._id, amountPayable )
-    //             res.json({ payment : payment , success : false  })
-    //         }
-    //     }
-    //     } catch ( error ) {
-    //         res.redirect('/500')
-    //     }
-    // },
     //Invoice
     getConfirmOrder:async(req,res)=>{
         try{
@@ -357,6 +237,7 @@ module.exports = {
                     await productSchema.updateOne({_id : products.productId},{$inc : {quantity : products.quantity}})
 
                 }
+                
                 await orderSchema.findOneAndUpdate({_id : orderId},{$set : {orderStatus : status}})
             }else {
                 await orderSchema.findOneAndUpdate({_id : orderId},{$set : {orderStatus : status}})
