@@ -151,10 +151,24 @@
                                                     <% } %>
                                                 <% } %>
                                             </div>
-                                            <!-- <p class="mb-0">Stock : <= product.quantity %></p> -->
-                                            <!-- <p class="mb-0"><del>₹ <= product.price %></del></p> -->
-        
-                                            <h5 class="mb-0">₹ <%= product.price %> <span class="badge badge-success"> Save 2% </span></h5>
+                                            <% if ( product.offer && !product.category.offer){ var discount = (product.price * product.offer.percentage / 100).toFixed(0)  } else if ( product.category.offer && !product.offer ) {var discount = ( product.price * product.category.offer.percentage / 100 ).toFixed(0) }else if ( product.category.offer && product.offer ){
+                                                if(product.offer.percentage<product.category.offer.percentage){
+                                                 {var discount = ( product.price * product.category.offer.percentage / 100 ).toFixed(0) }}
+                                                else{
+                                                    var discount = (product.price * product.offer.percentage / 100).toFixed(0)
+                                                }} %>
+                                            <% if ( product.offer && !product.category.offer) { %>
+                                                <p class="mb-0"><del>₹ <%= product.price %></del></p>
+                                                <h5 class="mb-0">₹ <%= product.price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                                            <%} else if ( product.category.offer && !product.offer ) { %>
+                                                <p class="mb-0"><del>₹ <%= product.price %></del></p>
+                                                <h5 class="mb-0 fw-700">₹ <%= product.price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                                            <%} else if ( product.category.offer && product.offer ) { %>
+                                                <p class="mb-0"><del>₹ <%= product.price %></del></p>
+                                                <h5 class="mb-0 fw-700">₹ <%= product.price - discount %> <span class="badge badge-success"> Save ₹ <%= discount %> </span></h5>
+                                                <% } else { %>
+                                                <h5>₹ <%= product.price %> </h5>
+                                            <% } %>
                                         </div>
                                     </div>
                                 </div>

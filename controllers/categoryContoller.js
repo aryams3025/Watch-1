@@ -36,12 +36,12 @@ if (sortData) {
 }
 
 //  sort object in  query
-            const availabileOffers = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }})
-            const categoryCount = await categorySchema.find(condition).sort(sort).count();
 
-
-              const category = await categorySchema.find( condition ).populate('offer')
+            const offer = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }})
+            const categoryCount = await categorySchema.find( condition ).count()
+            const category = await categorySchema.find( condition ).populate('offer')
             .sort( sort ).skip(( page - 1 ) * paginationHelper.CATEGORY_PER_PAGE ).limit( paginationHelper.CATEGORY_PER_PAGE )
+
             res.render( 'admin/category', {
                 admin : req.session.admin,
                 category : category,
@@ -56,7 +56,7 @@ if (sortData) {
                 search : search,
                 sortData : sortData,
                 sortOrder : sortOrder,
-                availabileOffers : availabileOffers
+                offer : offer
 
             } )
         
