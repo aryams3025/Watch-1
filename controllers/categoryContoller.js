@@ -26,18 +26,18 @@ module.exports ={
 
             let sort = {}; // Initialize an empty object for sorting
 
-if (sortData) {
-    // Check if sortData exists
-    if (sortOrder === 'Ascending') {
-        sort[sortData] = 1; 
-    } else {
-        sort[sortData] = -1; 
-    }
+            if (sortData) {
+            // Check if sortData exists
+                if (sortOrder === 'Ascending') {
+                     sort[sortData] = 1; 
+                } else {
+                    sort[sortData] = -1; 
+            }
 }
 
-//  sort object in  query
+            //  sort object in  query
 
-            const offer = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }})
+            const availableOffers = await offerSchema.find({ status : true, expiryDate : { $gte : new Date() }})
             const categoryCount = await categorySchema.find( condition ).count()
             const category = await categorySchema.find( condition ).populate('offer')
             .sort( sort ).skip(( page - 1 ) * paginationHelper.CATEGORY_PER_PAGE ).limit( paginationHelper.CATEGORY_PER_PAGE )
@@ -56,7 +56,7 @@ if (sortData) {
                 search : search,
                 sortData : sortData,
                 sortOrder : sortOrder,
-                offer : offer
+                availableOffers : availableOffers
 
             } )
         
@@ -70,7 +70,7 @@ if (sortData) {
             const category = await categorySchema.findOne({ category: cat });
             if (category) {
                 req.flash('categoryExist', 'Category already exists');
-                // res.redirect('/admin/category');
+                res.redirect('/admin/category');
             } else {
                 // Declare and initialize categoryName here
                 const categoryName = new categorySchema({ category: cat });

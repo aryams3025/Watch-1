@@ -83,13 +83,17 @@ module.exports = {
                 .limit(paginationHelper.ITEMS_PER_PAGE);
                 const newproducts = await productSchema.find()
                 .populate({
-                    path: "category",
-                    match: { status: true }
+                    path : 'offer',
+                    match :  { startingDate : { $lte : new Date() }, expiryDate : { $gte : new Date() }}
                 })
                 .populate({
-                    path: "brand",
-                    match: { status: true }
+                    path : 'category',
+                    populate : {
+                        path : 'offer',
+                        match : { startingDate : { $lte : new Date() }, expiryDate : { $gte : new Date() }}
+                    }
                 })
+               
                 .sort({createdAt:1}).skip(Math.max(0, productCount - 3))
     
             const filteredProducts = products.filter(product => product.category && product.brand);
@@ -200,6 +204,23 @@ checkoutAddAddress : async (req,res) =>{
     }catch(error){
         console.log(error);
     }
+},
+contactus:async(req,res)=>{
+    res.render('shop/contact')
+},
+contactsubmit:async(req,res)=>{
+    try{
+  const {email,phone,idea}=req.body
+  const comments=await contactSchema({
+    Email:email,
+    Idea:idea,
+    contact:phone
+  })
+  await comments.save()
+}catch(error){
+    res.redirect('/500')
+    
+}
 }
 
 

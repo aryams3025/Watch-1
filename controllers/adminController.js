@@ -153,7 +153,16 @@ module.exports = {
         }catch(error){
             console.log(error);
         }
-    }
+    },
+    ideas:async(req,res)=>{
+        try{
+            const ideas=await contactSchema.find()
+           
+            res.render('admin/ideas',{admin : req.session.admin,ideas:ideas})
+        }catch(error){
+            res.redirect('/500')
+        }
+    }  
     
     
 }
