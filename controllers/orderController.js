@@ -12,7 +12,147 @@ const paymentHelper = require('../helpers/paymentHelper')
 const { log } = require('console')
 
 module.exports = {
+    placeOrder: async (req, res) => {
+        try {
+            const { user } = req.session;
+            const products = await cartHelper.totalCartPrice(user);
+            const { paymentMethod, addressId, walletAmount } = req.body;
+            const productCount = await cartHelper.updateQuantity(user);
+            
+            if (productCount) {
+                // If product is not available when we are at checkout
+                req.session.productCount -= productCount;
+                return res.json({ outofStock: true });
+            }
     
+            let walletBalance;
+            if (walletAmount) {
+                walletBalance = Number(walletAmount);
+            }
+    
+            const productItems = products[0].items;
+    
+            // Inserting individual product details
+            const cartProducts = productItems.map((items) => ({
+                productId: items.productId,
+                quantity: items.quantity,
+                price: (items.totalPrice)
+            }));
+    
+            const cart = await cartSchema.findOne({ userId: user });
+            const totalAmount = await cartHelper.totalCartPrice(user);
+    
+            let discounted = {};
+            if (cart && cart.coupon && totalAmount && totalAmount.length > 0) {
+                discounted = await couponHelper.discountPrice(cart.coupon, totalAmount[0].total);
+                await couponSchema.updateOne({ _id: cart.coupon }, {
+                    $push: {
+                        users: user
+                    }
+                });
+            }
+    
+            let discountAmount = 0;
+            if (discounted.discountAmount > 0) {
+                discountAmount = discounted.discountAmount;
+            }
+    
+            const totalPrice = discounted && discounted.discountedTotal ? discounted.discountedTotal : totalAmount[0].total;
+            let walletUsed, amountPayable;
+    
+            if (walletAmount) {
+                if (totalPrice > walletBalance) {
+                    amountPayable = totalPrice - walletBalance;
+                    walletUsed = walletBalance;
+                } else {
+                    amountPayable = 0;
+                    walletUsed = totalPrice;
+                }
+            } else {
+                amountPayable = totalPrice;
+            }
+    
+            if (paymentMethod === 'COD' && totalPrice > 1000) {
+                return res.json({ success: false, message: 'COD is not available for orders above Rs 1000.' });
+            }
+    
+            let generatedID = Math.floor(100000 + Math.random() * 900000);
+            let existingOrder = await orderSchema.findOne({ orderId: generatedID });
+    
+            // Loop until a unique order ID is generated
+            while (existingOrder) {
+                generatedID = Math.floor(100000 + Math.random() * 900000);
+                existingOrder = await orderSchema.findOne({ orderId: generatedID });
+            }
+    
+            // Use the generated unique orderId for the new order
+            const orderId = `ORD${generatedID}`;
+    
+            let orderStatus;
+    
+            if (paymentMethod === 'razorpay') {
+                orderStatus = 'Confirmed'; // Update this line to set status to 'Confirmed' for Razorpay
+            } else {
+                if (totalPrice > 1000) {
+                    return res.json({ success: false, message: 'COD not available for orders above Rs 1000' });
+                }
+                orderStatus = 'Confirmed';
+            }
+    
+            const order = new orderSchema({
+                userId: user,
+                orderId: orderId,
+                products: cartProducts,
+                totalPrice: totalPrice,
+                paymentMethod: paymentMethod,
+                orderStatus: orderStatus,
+                address: addressId,
+                walletUsed: walletUsed,
+                amountPayable: amountPayable,
+                discounted: discountAmount
+            });
+    
+            const ordered = await order.save();
+    
+            // Decreasing quantity
+            for (const items of cartProducts) {
+                const { productId, quantity } = items;
+                await productSchema.updateOne({ _id: productId }, { $inc: { quantity: -quantity } });
+            }
+    
+            // Deleting cart
+            await cartSchema.deleteOne({ userId: user });
+            req.session.productCount = 0;
+    
+            if (paymentMethod === 'COD' && amountPayable === 0) {
+                // COD
+                if (walletAmount) {
+                    await userSchema.updateOne({ _id: user }, {
+                        $inc: {
+                            wallet: -walletUsed
+                        },
+                        $push: {
+                            walletHistory: {
+                                date: Date.now(),
+                                amount: -walletUsed,
+                                message: 'Used for purchase'
+                            }
+                        }
+                    });
+                }
+                return res.json({ success: true });
+            } else if (paymentMethod === 'razorpay') {
+                // Razorpay
+                const payment = await paymentHelper.razorpayPayment(ordered._id, amountPayable);
+                return res.json({ payment: payment, success: false });
+            } else {
+                // Other payment methods
+                return res.json({ success: true });
+            }
+        } catch (error) {
+            res.redirect('/500');
+        }
+    },
     //Invoice
     getConfirmOrder:async(req,res)=>{
         try{
@@ -402,147 +542,37 @@ orderSuccess : async(req,res) =>{
         console.log(error);
     }
 },
-placeOrder: async (req, res) => {
-    try {
-        const { user } = req.session;
-        const products = await cartHelper.totalCartPrice(user);
-        const { paymentMethod, addressId, walletAmount } = req.body;
-        const productCount = await cartHelper.updateQuantity(user);
-        
-        if (productCount) {
-            // If product is not available when we are at checkout
-            req.session.productCount -= productCount;
-            return res.json({ outofStock: true });
-        }
+// cancelledOrder: async (req, res) => {
+//     const orderId = req.query.orderId;
+//     console.log("Order ID:", orderId);
+//     const { user } = req.session;
+//     console.log("User ID:", user);
+//     const order = await orderSchema.findOne({ _id: orderId });
+//     console.log("Order:", order);
+//     for (let product of order.products) {
+//         await productSchema.updateOne({ _id: product.productId }, {
+//             $inc: { quantity: product.quantity }
+//         });
+//     }
 
-        let walletBalance;
-        if (walletAmount) {
-            walletBalance = Number(walletAmount);
-        }
+//     await orderSchema.updateOne({ _id: orderId }, {
+//         $set: { orderStatus: 'Cancelled' }
+//     });
 
-        const productItems = products[0].items;
+//     await userSchema.updateOne({ _id: user }, {
+//         $inc: { wallet: order.totalPrice },
+//         $push: {
+//             walletHistory: {
+//                 date: new Date(),
+//                 amount: order.totalPrice,
+//                 message: "Deposit on cancellation"
+//             }
+//         }
+//     });
 
-        // Inserting individual product details
-        const cartProducts = productItems.map((items) => ({
-            productId: items.productId,
-            quantity: items.quantity,
-            price: (items.totalPrice)
-        }));
+//     res.redirect('/user/orders');
+// }
 
-        const cart = await cartSchema.findOne({ userId: user });
-        const totalAmount = await cartHelper.totalCartPrice(user);
-
-        let discounted = {};
-        if (cart && cart.coupon && totalAmount && totalAmount.length > 0) {
-            discounted = await couponHelper.discountPrice(cart.coupon, totalAmount[0].total);
-            await couponSchema.updateOne({ _id: cart.coupon }, {
-                $push: {
-                    users: user
-                }
-            });
-        }
-
-        let discountAmount = 0;
-        if (discounted.discountAmount > 0) {
-            discountAmount = discounted.discountAmount;
-        }
-
-        const totalPrice = discounted && discounted.discountedTotal ? discounted.discountedTotal : totalAmount[0].total;
-        let walletUsed, amountPayable;
-
-        if (walletAmount) {
-            if (totalPrice > walletBalance) {
-                amountPayable = totalPrice - walletBalance;
-                walletUsed = walletBalance;
-            } else {
-                amountPayable = 0;
-                walletUsed = totalPrice;
-            }
-        } else {
-            amountPayable = totalPrice;
-        }
-
-        if (paymentMethod === 'COD' && totalPrice > 1000) {
-            return res.json({ success: false, message: 'COD is not available for orders above Rs 1000.' });
-        }
-
-        let generatedID = Math.floor(100000 + Math.random() * 900000);
-        let existingOrder = await orderSchema.findOne({ orderId: generatedID });
-
-        // Loop until a unique order ID is generated
-        while (existingOrder) {
-            generatedID = Math.floor(100000 + Math.random() * 900000);
-            existingOrder = await orderSchema.findOne({ orderId: generatedID });
-        }
-
-        // Use the generated unique orderId for the new order
-        const orderId = `ORD${generatedID}`;
-
-        let orderStatus;
-
-        if (paymentMethod === 'razorpay') {
-            orderStatus = 'Confirmed'; // Update this line to set status to 'Confirmed' for Razorpay
-        } else {
-            if (totalPrice > 1000) {
-                return res.json({ success: false, message: 'COD not available for orders above Rs 1000' });
-            }
-            orderStatus = 'Confirmed';
-        }
-
-        const order = new orderSchema({
-            userId: user,
-            orderId: orderId,
-            products: cartProducts,
-            totalPrice: totalPrice,
-            paymentMethod: paymentMethod,
-            orderStatus: orderStatus,
-            address: addressId,
-            walletUsed: walletUsed,
-            amountPayable: amountPayable,
-            discounted: discountAmount
-        });
-
-        const ordered = await order.save();
-
-        // Decreasing quantity
-        for (const items of cartProducts) {
-            const { productId, quantity } = items;
-            await productSchema.updateOne({ _id: productId }, { $inc: { quantity: -quantity } });
-        }
-
-        // Deleting cart
-        await cartSchema.deleteOne({ userId: user });
-        req.session.productCount = 0;
-
-        if (paymentMethod === 'COD' && amountPayable === 0) {
-            // COD
-            if (walletAmount) {
-                await userSchema.updateOne({ _id: user }, {
-                    $inc: {
-                        wallet: -walletUsed
-                    },
-                    $push: {
-                        walletHistory: {
-                            date: Date.now(),
-                            amount: -walletUsed,
-                            message: 'Used for purchase'
-                        }
-                    }
-                });
-            }
-            return res.json({ success: true });
-        } else if (paymentMethod === 'razorpay') {
-            // Razorpay
-            const payment = await paymentHelper.razorpayPayment(ordered._id, amountPayable);
-            return res.json({ payment: payment, success: false });
-        } else {
-            // Other payment methods
-            return res.json({ success: true });
-        }
-    } catch (error) {
-        res.redirect('/500');
-    }
-}
 
 
 }

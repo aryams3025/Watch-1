@@ -1,9 +1,7 @@
 const express=require('express')
 const router=express.Router()
-
 const multer = require('multer')
 const upload_image = require('../middleware/multer.js')
-
 const adminController = require('../controllers/adminController.js')
 const authController=require('../controllers/authController.js')
 const productController = require('../controllers/productController.js')
@@ -31,7 +29,6 @@ router.post('/edit-product',isAuth.adminAuth,upload_image.array('image',4),produ
 router.get('/list-product/:id',isAuth.adminAuth,productController.listProduct)
 router.get('/unlist-product/:id',isAuth.adminAuth,productController.unlistProduct)
 router.get('/delete-image',isAuth.adminAuth,productController.deleteImage)
-
 
 //admin category management
 

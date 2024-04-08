@@ -139,7 +139,7 @@
 
               <h4 class="card-title">Category</h4>
               <div class="table-responsive">
-                  <table class="table">
+                <table class="table">
                   <thead>
                       <tr>
                           <th> Category Name </th>
@@ -225,7 +225,8 @@
 
 <div class="modal fade" id="discountModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
-    
+    <% if( availableOffers && availableOffers.length > 0) { %>
+      <% for( offer of availableOffers ) { %>
     
 
           <div class="modal-content rounded-0">
@@ -242,7 +243,8 @@
               </div>
           </div>
       
-      
+          <% } %>
+          <% } %>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -259,35 +261,65 @@
             };
         });
     }
-    async function enterOffer(offerId, categoryId) {
-  $('#discountModal').modal('hide');
-  try {
-    const response = await axios.patch('/admin/apply-category-offer', { offerId, categoryId });
 
-    if (response.data.success) {
-      Swal.fire({
-        icon: 'success',
-        title: 'Offer applied',
-        text:"Offer Applied",
-        showConfirmButton: false,
-        timer: 1500, 
-      });
+
+
+//   async function enterOffer(offerId, categoryId) {
+//   $('#discountModal').modal('hide');
+//   try {
+//     const response = await axios.patch('/admin/apply-category-offer', { offerId, categoryId });
+
+//     if (response.data.success) {
+//       Swal.fire({
+//         icon: 'success',
+//         title: 'Offer applied',
+//         text:"Offer Applied",
+//         showConfirmButton: false,
+//         timer: 1500, 
+//       });
 
       
-      setTimeout(() => {
-        window.location = '/admin/category';
-      }, 1500); 
-    }
-  } catch (error) {
+//       setTimeout(() => {
+//         window.location = '/admin/category';
+//       }, 1500); 
+//     }
+//   } catch (error) {
     
-    console.error('Error applying offer:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error applying offer',
-      text: 'An error occurred while applying the offer. Please try again.',
-    });
-  }
+//     Swal.fire({
+//   icon: 'error',
+//   title: 'Error applying offer',
+//   text: 'An error occurred while applying the offer. Please try again.',
+// });
+
+//   }
+// }
+
+async function enterOffer(offerId, categoryId) {
+    $('#discountModal').modal('hide');
+    try {
+        const response = await axios.patch('/admin/apply-category-offer', { offerId, categoryId });
+
+        if (response.data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Offer applied',
+                text: "Offer Applied",
+                showConfirmButton: false,
+                timer: 1500,
+                onClose: () => {
+                    window.location.href = '/admin/category'; // Redirect to category page after successful offer application
+                }
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error applying offer',
+            text: 'An error occurred while applying the offer. Please try again.',
+        });
+    }
 }
+
 
 
 async function removeOffer(categoryId) {
