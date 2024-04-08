@@ -13,6 +13,8 @@ const orderController = require('../controllers/orderController')
 // router.get('/', shopController.getHome);
 router.get('/shop',shopController.getShop);
 router.get('/products/:id',shopController.getSingleProduct)
+router.get('/contactus',isAuth.userAuth,shopController.contactus)
+router.post('/contactsubmit',isAuth.userAuth,shopController.contactsubmit)
 
 //cart
 

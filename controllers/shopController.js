@@ -204,6 +204,23 @@ checkoutAddAddress : async (req,res) =>{
     }catch(error){
         console.log(error);
     }
+},
+contactus:async(req,res)=>{
+    res.render('shop/contact')
+},
+contactsubmit:async(req,res)=>{
+    try{
+  const {email,phone,idea}=req.body
+  const comments=await contactSchema({
+    Email:email,
+    Idea:idea,
+    contact:phone
+  })
+  await comments.save()
+}catch(error){
+    res.redirect('/500')
+    
+}
 }
 
 

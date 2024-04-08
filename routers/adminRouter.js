@@ -88,4 +88,6 @@ router.get('/sales-report',isAuth.adminAuth,orderController.getSalesReport)
 
 //router.post('/filterchart',isAuth.adminAuth,adminController.filterchart)
 
+router.get('/ideas',isAuth.adminAuth,adminController.ideas)
+
 module.exports = router
