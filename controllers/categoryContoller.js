@@ -153,6 +153,7 @@ module.exports ={
      applyCategoryOffer:async(req,res)=>{
         try{
             const {offerId,categoryId}=req.body
+            console.log(offerId);
             await categorySchema.updateOne({_id:categoryId},{
                 $set:{
                     offer:offerId
