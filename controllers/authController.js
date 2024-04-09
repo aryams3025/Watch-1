@@ -4,9 +4,11 @@ const adminSchema = require('../model/adminSchema')
 const flash = require('express-flash');
 const verificationController = require('../controllers/verificationController');
 const { longFormatters } = require('date-fns');
+const {io} = require('../middleware/socket')
 
 
 module.exports={
+   
     getHome:async(req,res)=>{
         try{
             res.render('shop/home')
@@ -74,7 +76,8 @@ userLogin: async(req,res)=>{
 
 usersignUp : async(req,res)=>{
     try{
-        res.render('auth/userSignup')
+        const err = req.session.err || '';
+        res.render('auth/userSignup',{err : err})
     }catch(error){
         console.log(error);
     }
@@ -153,7 +156,6 @@ postuserSignup :  async(req,res)=>{
             console.log(error);
         }
     },
-
     //resending otp
     // resendOtp : async(req,res)=>{
        
@@ -242,6 +244,10 @@ postuserSignup :  async(req,res)=>{
     doAdminLogout:(req,res)=>{
         try{
             req.session.admin=null
+            function clearLocalStorage() {
+                localStorage.clear();
+            }
+            clearLocalStorage();
             req.session.destroy(function(err) {
                 if (err) {
                     // Handle error if session cannot be destroyed

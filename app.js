@@ -80,7 +80,7 @@ app.get('/', ensureAuthenticated, (req, res) => {
     res.send('Welcome, ' + req.user.username);
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server connected at http://localhost:${PORT}/`);
 });
